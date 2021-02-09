@@ -1,48 +1,85 @@
-import Head from 'next/head'
-import Layout, { siteTitle } from '../components/layout'
-import utilStyles from '../styles/utils.module.css'
-import { getSortedPostsData } from '../lib/posts'
-import Link from 'next/link'
-import Date from '../components/date'
+import { verifyMessage } from "@ethersproject/wallet";
+import { useWeb3React } from "@web3-react/core";
+import Head from "next/head";
+import Link from "next/link";
+import Account from "../components/Account";
+import ETHBalance from "../components/ETHBalance";
+import useEagerConnect from "../hooks/useEagerConnect";
+import usePersonalSign, { hexlify } from "../hooks/usePersonalSign";
 
-export default function Home({ allPostsData }) {
+export default function Home() {
+  const { account, library } = useWeb3React();
+
+  const triedToEagerConnect = useEagerConnect();
+
+  const sign = usePersonalSign();
+
+  const handleSign = async () => {
+    const msg = "Next Web3 Boilerplate Rules";
+    const sig = await sign(msg);
+    console.log(sig);
+    console.log("isValid", verifyMessage(msg, sig) === account);
+  };
+
+  const isConnected = typeof account === "string" && !!library;
+
   return (
-    <Layout home>
+    <div>
       <Head>
-        <title>{siteTitle}</title>
+        <title>Next Web3 Boilerplate</title>
+        <link rel="icon" href="/favicon.ico" />
       </Head>
-      <section className={utilStyles.headingMd}>
-        <p>[Your Self Introduction]</p>
-        <p>
-          (This is a sample website - you’ll be building a site like this in{' '}
-          <a href="https://nextjs.org/learn">our Next.js tutorial</a>.)
-        </p>
-      </section>
-      <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
-        <h2 className={utilStyles.headingLg}>Blog</h2>
-        <ul className={utilStyles.list}>
-          {allPostsData.map(({ id, date, title }) => (
-            <li className={utilStyles.listItem} key={id}>
-              <Link href={`/posts/${id}`}>
-                <a>{title}</a>
-              </Link>
-              <br />
-              <small className={utilStyles.lightText}>
-                <Date dateString={date} />
-              </small>
-            </li>
-          ))}
-        </ul>
-      </section>
-    </Layout>
-  )
-}
 
-export async function getStaticProps() {
-  const allPostsData = getSortedPostsData()
-  return {
-    props: {
-      allPostsData
-    }
-  }
+      <header>
+        <nav>
+          <Account triedToEagerConnect={triedToEagerConnect} />
+        </nav>
+      </header>
+
+      <main>
+        <h1>
+          Welcome to{" "}
+          <a href="https://github.com/mirshko/next-web3-boilerplate">
+            Next Web3 Boilerplate
+          </a>
+        </h1>
+
+        {isConnected && (
+          <section>
+            <ETHBalance />
+            <button onClick={handleSign}>Personal Sign</button>
+          </section>
+        )}
+      </main>
+
+      <style jsx>{`
+        nav {
+          display: flex;
+          justify-content: space-between;
+        }
+
+        main {
+          text-align: center;
+        }
+      `}</style>
+
+      <style jsx global>{`
+        body {
+          margin: 0;
+        }
+
+        html {
+          font-family: sans-serif, Apple Color Emoji, Segoe UI Emoji,
+            Segoe UI Symbol, Noto Color Emoji;
+          line-height: 1.5;
+        }
+
+        *,
+        *::after,
+        *::before {
+          box-sizing: border-box;
+        }
+      `}</style>
+    </div>
+  );
 }
