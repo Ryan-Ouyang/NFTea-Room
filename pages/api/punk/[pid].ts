@@ -6,6 +6,36 @@ type PunkInfo = {
   gender: "Male" | "Female";
   accessories: string[];
   imageUrl?: string;
+  info: CryptoPunk;
+};
+
+type CryptoPunk = {
+  id: string;
+  owner: {
+    id: string;
+  };
+  transferedTo?: {
+    id: string;
+  };
+  assignedTo?: {
+    id: string;
+  };
+  bid?: Bid[];
+  offer?: Offer[];
+};
+
+type Bid = {
+  id: string;
+  bid: string;
+  bidder: string;
+};
+
+type Offer = {
+  id: string;
+  offeredBy: {
+    id: string;
+  };
+  amountOffered: string;
 };
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -17,22 +47,20 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   {
     cryptoPunks(where: {id: "${pid}"}) {
       id
-      transferedTo {
+      owner {
         id
       }
-      purchase {
+      transferedTo {
         id
       }
       assignedTo {
         id
       }
       bid {
-        id
         bid
         bidder
       }
       offer {
-        id
         offeredBy {
           id
         }
@@ -49,8 +77,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     query
   );
 
-  res.json({
-    punkInfo: punkInfo,
-    queryData: graphData,
-  });
+  punkInfo.info = (graphData.cryptoPunks as CryptoPunk[])[0];
+
+  res.json(punkInfo);
 };
