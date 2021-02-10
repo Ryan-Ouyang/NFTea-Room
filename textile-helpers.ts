@@ -15,3 +15,6 @@ export const schema = {
     new_price: { type: "number" },
   },
 };
+
+export const dbThreadID =
+  "bafk4oufbotvljpizzljskscjeg42wcgmfxbqsibtzy6fotrxtjobvzy";
