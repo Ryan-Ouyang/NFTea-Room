@@ -18,3 +18,8 @@ export const schema = {
 
 export const dbThreadID =
   "bafk4oufbotvljpizzljskscjeg42wcgmfxbqsibtzy6fotrxtjobvzy";
+
+export type Suggestion = {
+  NFT_ID: string;
+  new_price: number;
+};

@@ -11,6 +11,7 @@ export const TextileProvider = ({ children }) => {
 
   const [client, setClient] = useState(undefined);
   const [identity, setIdentity] = useState(undefined);
+  const [token, setToken] = useState(undefined);
 
   async function connectToTextile() {
     const client = await Client.withKeyInfo(keyInfo);
@@ -18,12 +19,13 @@ export const TextileProvider = ({ children }) => {
     console.log("Successfully init Textile client:");
     console.log(client);
 
-    await connectToMetamask();
+    const identity = await connectToMetamask();
     console.log(
       "Successfully connected to metamask with identity: " + identity
     );
 
     const token = await client.getToken(identity);
+    setToken(token);
     console.log("Successfully got token: " + token);
 
     const dbInfo = await client.getDBInfo(ThreadID.fromString(dbThreadID));
@@ -105,6 +107,8 @@ export const TextileProvider = ({ children }) => {
     }
     const identity = PrivateKey.fromRawEd25519Seed(Uint8Array.from(array));
     setIdentity(identity);
+
+    return identity;
   }
 
   return (
@@ -112,6 +116,7 @@ export const TextileProvider = ({ children }) => {
       value={{
         client,
         identity,
+        token,
         connectToTextile,
       }}
     >

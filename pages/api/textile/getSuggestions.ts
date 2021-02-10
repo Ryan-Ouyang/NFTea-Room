@@ -15,7 +15,9 @@ export const getSuggestions = async (): Promise<any[]> => {
   );
 };
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const result = getSuggestions();
   res.json(result);
 };
+
+export default handler;
