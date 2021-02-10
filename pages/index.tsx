@@ -7,6 +7,9 @@ import ETHBalance from "../components/ETHBalance";
 import useEagerConnect from "../hooks/useEagerConnect";
 import usePersonalSign, { hexlify } from "../hooks/usePersonalSign";
 
+import { Client, PrivateKey, UserAuth, ThreadID } from "@textile/hub";
+import { useEffect, useState } from "react";
+
 export default function Home() {
   const { account, library } = useWeb3React();
 
