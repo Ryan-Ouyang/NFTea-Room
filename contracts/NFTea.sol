@@ -38,7 +38,8 @@ contract NFTea is Context, IERC20 {
 
     string private _name;
     string private _symbol;
-
+    
+    address private _owner;
     /**
      * @dev Sets the values for {name} and {symbol}.
      *
@@ -51,6 +52,8 @@ contract NFTea is Context, IERC20 {
     constructor (string memory name_, string memory symbol_) {
         _name = name_;
         _symbol = symbol_;
+        _owner = msg.sender;
+        
     }
 
     /**
@@ -230,9 +233,9 @@ contract NFTea is Context, IERC20 {
      *
      * - `to` cannot be the zero address.
      */
-    function _mint(address account, uint256 amount) internal virtual {
+    function mint(address account, uint256 amount) public virtual {
         require(account != address(0), "ERC20: mint to the zero address");
-
+        require(msg.sender == _owner, "Message sender should be owner");
         _beforeTokenTransfer(address(0), account, amount);
 
         _totalSupply += amount;

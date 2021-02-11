@@ -1,6 +1,6 @@
 import { Client, PrivateKey, ThreadID } from "@textile/hub";
 import { NextApiRequest, NextApiResponse } from "next";
-import { dbThreadID, keyInfo } from "../../../textile-helpers";
+import { dbCollectionID, dbThreadID, keyInfo } from "../../../textile-helpers";
 
 export const getSuggestions = async (): Promise<any[]> => {
   const client = await Client.withKeyInfo(keyInfo);
@@ -8,11 +8,7 @@ export const getSuggestions = async (): Promise<any[]> => {
   // const dbInfo = await client.getDBInfo(ThreadID.fromString(dbThreadID));
   // await client.joinFromInfo(dbInfo);
 
-  return await client.find(
-    ThreadID.fromString(dbThreadID),
-    "Price-Suggestions",
-    {}
-  );
+  return await client.find(ThreadID.fromString(dbThreadID), dbCollectionID, {});
 };
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {

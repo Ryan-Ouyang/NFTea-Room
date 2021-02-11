@@ -13,13 +13,29 @@ export const schema = {
     _id: { type: "string" },
     NFT_ID: { type: "string" },
     new_price: { type: "number" },
+    comments: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          identity: {
+            type: "string",
+          },
+          content: {
+            type: "string",
+          },
+        },
+      },
+    },
   },
 };
 
 export const dbThreadID =
-  "bafk4oufbotvljpizzljskscjeg42wcgmfxbqsibtzy6fotrxtjobvzy";
+  "bafksuyczsxgl3p6mlwk5qwx6jtcsvuftl7y5y2t4xj7j2qxhtpaod5i";
+export const dbCollectionID = "Suggestions";
 
 export type Suggestion = {
   NFT_ID: string;
   new_price: number;
+  comments: object[];
 };

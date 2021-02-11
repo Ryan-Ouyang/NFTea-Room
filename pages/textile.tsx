@@ -1,27 +1,9 @@
 import { Client, PrivateKey, UserAuth, ThreadID, KeyInfo } from "@textile/hub";
 import { useEffect, useState } from "react";
+import { dbThreadID, keyInfo, schema } from "../textile-helpers";
 
 export default function Textile() {
   // Textile stuff
-
-  const keyInfo: KeyInfo = {
-    key: "buyh2yjxxheyvgkd7zijwlcmm5m",
-    secret: "bp52erpfqyi5d72ttlorne4bdfenkuxxwytla2za",
-  };
-
-  const schema = {
-    $schema: "http://json-schema.org/draft-07/schema#",
-    title: "Suggestion",
-    type: "object",
-    properties: {
-      _id: { type: "string" },
-      NFT_ID: { type: "string" },
-      new_price: { type: "number" },
-    },
-  };
-
-  const dbThreadID = "bafk4oufbotvljpizzljskscjeg42wcgmfxbqsibtzy6fotrxtjobvzy";
-
   const [client, setClient] = useState(undefined);
   const [token, setToken] = useState(undefined);
 
@@ -48,7 +30,7 @@ export default function Textile() {
 
   async function collectionFromSchema(client: Client) {
     await client.newCollection(ThreadID.fromString(dbThreadID), {
-      name: "Price-Suggestions",
+      name: "Suggestions",
       schema: schema,
     });
   }
