@@ -15,8 +15,10 @@ import createProposal from "../utils/submitProposal";
 import sponsorProposal from "../utils/sponsorProposal";
 import submitVote from "../utils/submitVote";
 import { Vote } from "../modals/vote";
+import { useRouter } from "next/router";
 
 export default function Home(props) {
+  const router = useRouter();
   const [suggestions, setSuggestions] = useState([]);
   useEffect(() => {
     props.suggestions && setSuggestions(props.suggestions);
@@ -26,69 +28,19 @@ export default function Home(props) {
   const { account, library } = useWeb3React();
   const triedToEagerConnect = useEagerConnect();
   const isConnected = typeof account === "string" && !!library;
-  const [isSubmittedProposal, setIsSubmittedProposal] = useState(false);
-  const [proposalIndex, setProposalIndex] = useState(0);
-  // TODO: Change the details according to the proposal
-  // Create Proposal options
-  const cp: CreateProposalOptions = {
-    applicant: account,
-    sharesRequested: 0,
-    lootRequested: 0,
-    tributeOffered: 0,
-    tributeToken: "0xebaadba116d4a72b985c3fae11d5a9a7291a3e70",
-    paymentRequested: 100000000,
-    paymentToken: "0xebaadba116d4a72b985c3fae11d5a9a7291a3e70",
-    details: "abcdef",
-  };
-
-  // Initialize Daohaus contract
-  const daoHaus = useDaoHausContract(
-    "0x3b9ad1e37a00d5430faeef38ad4aaefbd895091f"
-  );
 
   // Textile Stuff
   const { client, connectToTextile, token } = useContext(TextileContext);
 
-  // Submit Proposal
-  const submitProposal = async () => {
-    try {
-      let proposalId = await createProposal(daoHaus, cp);
-      let _proposalIndex = await sponsorProposal(daoHaus, proposalId);
-      setProposalIndex(_proposalIndex);
-      setIsSubmittedProposal(true);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
   // Submit Votes
   // TODO: Only works with yes right now
-
-  const submitVotes = async () => {
-    try {
-      await submitVote(daoHaus, proposalIndex, Vote.Yes);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const createSuggestion = async (data: any) => {
-    const suggestion: Suggestion = {
-      nft_id: data.nft_id,
-      new_price: data.new_price,
-      comments: [],
-      proposal_id: 1,
-      proposal_index: 1,
-    };
-
-    const result = await client.create(
-      ThreadID.fromString(dbThreadID),
-      dbCollectionID,
-      [suggestion]
-    );
-
-    alert("Successfully created proposal");
-    setSuggestions(await getSuggestions());
-  };
+  // const submitVotes = async () => {
+  //   try {
+  //     await submitVote(daoHaus, proposalIndex, Vote.Yes);
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
 
   const addComment = async (index: number, data: any) => {
     const suggestion = suggestions[index];
@@ -115,55 +67,31 @@ export default function Home(props) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>
+      <nav className="flex flex-row items-center p-3 md:px-16 border-b-2">
+        <div>NFTea Room</div>
+        <div className="flex-grow"></div>
         <Account triedToEagerConnect={triedToEagerConnect} />
-
-        {isConnected && (
-          <section>
-            <ETHBalance />
-
-            {/* Textile */}
-            {!client && (
-              <div>
-                <button onClick={() => connectToTextile()}>
-                  Connect to Textile
-                </button>
-                {!isSubmittedProposal ? (
-                  <button onClick={() => submitProposal()}>
-                    Submit Proposal
-                  </button>
-                ) : (
-                  <button onClick={() => submitVotes()}>Submit Vote</button>
-                )}
-              </div>
-            )}
-
-            {client && token && (
-              <Formik
-                initialValues={{ nft_id: "", new_price: 0 }}
-                onSubmit={(values, { setSubmitting }) => {
-                  createSuggestion(values);
-                  setSubmitting(false);
-                }}
-              >
-                {({ isSubmitting }) => (
-                  <Form>
-                    <label>nft_id:</label>
-                    <Field type="text" name="nft_id" />
-                    <br />
-                    <label>new_price:</label>
-                    <Field type="number" name="new_price" />
-                    <br />
-                    <button type="submit" disabled={isSubmitting}>
-                      Submit
-                    </button>
-                  </Form>
-                )}
-              </Formik>
-            )}
-          </section>
+        {isConnected && !client && (
+          <>
+            <button
+              className="ml-6 p-2 rounded border-2 border-black hover:text-blue-700"
+              onClick={() => connectToTextile()}
+            >
+              Connect to Textile
+            </button>
+          </>
         )}
+        {isConnected && client && (
+          <button
+            className="ml-6 p-2 rounded border-2 border-black hover:text-blue-700"
+            onClick={() => router.push("/proposals/create")}
+          >
+            Submit Proposal
+          </button>
+        )}
+      </nav>
 
+      <main>
         <section>
           {suggestions.map(({ _id, nft_id, new_price, comments }, index) => {
             return (
@@ -204,36 +132,6 @@ export default function Home(props) {
           })}
         </section>
       </main>
-
-      <style jsx>{`
-        main {
-          text-align: center;
-        }
-
-        .suggestion {
-          text-align: center;
-          border: 1px solid black;
-          max-width: 600px;
-          margin: 0 auto;
-        }
-      `}</style>
-
-      <style jsx global>{`
-        body {
-          margin: 0;
-        }
-
-        html {
-          font-family: sans-serif, Apple Color Emoji, Segoe UI Emoji,
-            Segoe UI Symbol, Noto Color Emoji;
-        }
-
-        *,
-        *::after,
-        *::before {
-          box-sizing: border-box;
-        }
-      `}</style>
     </div>
   );
 }
