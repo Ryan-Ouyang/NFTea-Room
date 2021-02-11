@@ -1,5 +1,6 @@
 import { useWeb3React } from "@web3-react/core";
 import Head from "next/head";
+import Image from "next/image";
 import Account from "../components/Account";
 import ETHBalance from "../components/ETHBalance";
 import useEagerConnect from "../hooks/useEagerConnect";
@@ -92,44 +93,54 @@ export default function Home(props) {
       </nav>
 
       <main>
-        <section>
-          {suggestions.map(({ _id, nft_id, new_price, comments }, index) => {
-            return (
-              <div className="suggestion" key={index}>
-                <h1>Name: {nft_id}</h1>
-                <p>New price: {new_price}</p>
-                <div>
-                  {comments.map(({ identity, content }) => (
+        <h1 className="text-xl text-center mt-4">
+          Currently Active Proposals:
+        </h1>
+        <section className="container mx-auto mt-6">
+          <div className="grid grid-cols-3">
+            {suggestions.map(({ _id, nft_id, new_price, comments }, index) => {
+              return (
+                <div className="m-2 border border-gray-200 rounded" key={index}>
+                  <img src="https://www.larvalabs.com/cryptopunks/cryptopunk5.png" />
+                  <div className="p-2">
+                    <h1>Name: {nft_id}</h1>
+                    <p>
+                      Price: Ξ1 {"-->"} Ξ{new_price}
+                    </p>
                     <div>
-                      <p>ID: {identity}</p>
-                      <p>Comment: {content}</p>
+                      {comments.map(({ identity, content }) => (
+                        <div>
+                          <p>ID: {identity.substring(0, 5)}...</p>
+                          <p>Comment: {content}</p>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-                <div>
-                  {client && token && (
-                    <Formik
-                      initialValues={{ text: "" }}
-                      onSubmit={(values, { setSubmitting, resetForm }) => {
-                        addComment(index, values);
-                        resetForm();
-                        setSubmitting(false);
-                      }}
-                    >
-                      {({ isSubmitting }) => (
-                        <Form>
-                          <Field type="text" name="text" />
-                          <button type="submit" disabled={isSubmitting}>
-                            Comment
-                          </button>
-                        </Form>
+                    <div>
+                      {client && token && (
+                        <Formik
+                          initialValues={{ text: "" }}
+                          onSubmit={(values, { setSubmitting, resetForm }) => {
+                            addComment(index, values);
+                            resetForm();
+                            setSubmitting(false);
+                          }}
+                        >
+                          {({ isSubmitting }) => (
+                            <Form>
+                              <Field type="text" name="text" />
+                              <button type="submit" disabled={isSubmitting}>
+                                Comment
+                              </button>
+                            </Form>
+                          )}
+                        </Formik>
                       )}
-                    </Formik>
-                  )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </section>
       </main>
     </div>
