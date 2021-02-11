@@ -1,4 +1,4 @@
-import { Contract } from "web3-eth-contract";
+import { Contract } from "@ethersproject/contracts";
 import { Vote } from "../modals/vote";
 
 export default async function submitVote(
@@ -15,10 +15,11 @@ export default async function submitVote(
   } else {
     uintVote = 2;
   }
+  try {
+    const submittedVote = await instance.submitVote(proposalIndex, uintVote);
 
-  const submittedVote = await instance.methods
-    .submitVote(proposalIndex, uintVote)
-    .call();
-
-  console.log(submittedVote);
+    console.log(submittedVote);
+  } catch (e) {
+    console.error(e);
+  }
 }

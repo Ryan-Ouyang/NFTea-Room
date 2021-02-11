@@ -1,5 +1,4 @@
-import { Contract } from "web3-eth-contract";
-import { Proposal } from "../modals/proposal";
+import { Contract } from "@ethersproject/contracts";
 
 // Process the Proposal
 export default async function processProposal(
@@ -7,8 +6,8 @@ export default async function processProposal(
   instance: Contract
 ): Promise<any> {
   try {
-    await instance.methods.processProposal(proposalIndex).call();
+    await instance.processProposal(proposalIndex);
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 }

@@ -1,26 +1,26 @@
-import { Contract } from "web3-eth-contract";
-import { Proposal } from "../modals/proposal";
+import { Contract } from "@ethersproject/contracts";
+import CreateProposalOptions from "../modals/createProposalOptions";
 
 // Submit Proposal using DaoHause
 export default async function createProposal(
   instance: Contract,
-  p: Proposal
+  p: CreateProposalOptions
 ): Promise<any> {
   try {
-    await instance.methods
-      .submitProposal(
-        p.applicant,
-        p.sharesRequested,
-        p.lootRequested,
-        p.tributeOffered,
-        p.tributeToken,
-        p.paymentRequested,
-        p.paymentToken,
-        p.details,
-        p.flags
-      )
-      .call();
+    await instance.submitProposal(
+      p.applicant,
+      p.sharesRequested,
+      p.lootRequested,
+      p.tributeOffered,
+      p.tributeToken,
+      p.paymentRequested,
+      p.paymentToken,
+      p.details,
+      {
+        gasLimit: 300000,
+      }
+    );
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 }

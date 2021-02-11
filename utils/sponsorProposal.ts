@@ -1,12 +1,15 @@
-import { Contract } from "web3-eth-contract";
+import { Contract } from "@ethersproject/contracts";
 
 export default async function sponsorProposal(
   instance: Contract,
   proposalId: number
 ): Promise<void> {
-  const sponsoredProposal = await instance.methods
-    .sponsorProposal(proposalId)
-    .call();
-
-  console.log(sponsoredProposal);
+  try {
+    const sponsoredProposal = await instance.methods.sponsorProposal(
+      proposalId
+    );
+    console.log(sponsoredProposal);
+  } catch (e) {
+    console.error(e);
+  }
 }

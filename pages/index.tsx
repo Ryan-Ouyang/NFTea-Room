@@ -3,12 +3,15 @@ import Head from "next/head";
 import Account from "../components/Account";
 import ETHBalance from "../components/ETHBalance";
 import useEagerConnect from "../hooks/useEagerConnect";
+import useDaoHausContract from "../hooks/useDaoHausContract";
 import { TextileContext } from "../contexts/textile";
 import React, { useContext, useEffect, useState } from "react";
 import { getSuggestions } from "./api/textile/getSuggestions";
 import { Field, Form, Formik } from "formik";
 import { ThreadID } from "@textile/hub";
 import { dbThreadID, Suggestion } from "../textile-helpers";
+import CreateProposalOptions from "../modals/createProposalOptions";
+import submitProposal from "../utils/submitProposal";
 
 export default function Home(props) {
   const [suggestions, setSuggestions] = useState([]);
@@ -20,6 +23,30 @@ export default function Home(props) {
   const { account, library } = useWeb3React();
   const triedToEagerConnect = useEagerConnect();
   const isConnected = typeof account === "string" && !!library;
+
+  // const daohaus = useDaoHausContract(
+  //   "0xc33a4efecb11d2cad8e7d8d2a6b5e7feaccc521d"
+  // );
+  // console.log(daohaus);
+
+  // const cp: CreateProposalOptions = {
+  //   applicant: "0x0D1f2Bd5351a65a78Ac0BeF3C8fAEf643C046508",
+  //   sharesRequested: 0,
+  //   lootRequested: 0,
+  //   tributeOffered: 0,
+  //   tributeToken: "0x81d6967ca79138d07be57aee855485a14ae33891",
+  //   paymentRequested: 0,
+  //   paymentToken: "0x81d6967ca79138d07be57aee855485a14ae33891",
+  //   details: "abcdef",
+  // };
+
+  // useEffect(() => {
+  //   submitProposal(daohaus, cp)
+  //     .then((a) => {
+  //       console.log(a);
+  //     })
+  //     .catch((err) => console.log(err));
+  // }, []);
 
   // Textile Stuff
   const { client, connectToTextile, token } = useContext(TextileContext);
