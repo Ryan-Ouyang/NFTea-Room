@@ -1,4 +1,3 @@
-import { GetThreadRequest } from "@textile/hub";
 import molochABI from "../contracts/abis/Molochv2.1.json";
 import useContract from "./useContract";
 

@@ -4,6 +4,8 @@ import Account from "../components/Account";
 import ETHBalance from "../components/ETHBalance";
 import useEagerConnect from "../hooks/useEagerConnect";
 import useDaoHausContract from "../hooks/useDaoHausContract";
+import usePriceTrackerContract from "../hooks/usePriceTrackerContract";
+import useMinionContract from "../hooks/useMinionContract";
 import { TextileContext } from "../contexts/textile";
 import React, { useContext, useEffect, useState } from "react";
 import { getSuggestions } from "./api/textile/getSuggestions";
@@ -15,6 +17,7 @@ import createProposal from "../utils/submitProposal";
 import sponsorProposal from "../utils/sponsorProposal";
 import submitVote from "../utils/submitVote";
 import { Vote } from "../modals/vote";
+import * as constants from "../constants";
 
 export default function Home(props) {
   const [suggestions, setSuggestions] = useState([]);
@@ -42,8 +45,12 @@ export default function Home(props) {
   };
 
   // Initialize Daohaus contract
-  const daoHaus = useDaoHausContract(
-    "0x3b9ad1e37a00d5430faeef38ad4aaefbd895091f"
+  const daoHaus = useDaoHausContract(constants.DAO_CONTRACT_ADDRESS);
+  // Initialize Minion contract
+  const minion = useMinionContract(constants.MINION_CONTRACT_ADDRESS);
+  // Initialize PriceTracker contract
+  const pricetracker = usePriceTrackerContract(
+    constants.PRICETRACKER_CONTRACT_ADDRESS
   );
 
   // Textile Stuff
