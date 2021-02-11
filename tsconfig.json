@@ -22,7 +22,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "modals/proposal.js"  ],
   "exclude": [
     "node_modules"
   ]
