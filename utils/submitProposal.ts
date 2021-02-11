@@ -1,13 +1,26 @@
-import  Molochv2 from  '../contracts/abis/Molochv2.1.json' ;
-import {WebsocketProvider} from "web3-core"
+import { Contract } from "web3-eth-contract";
+import { Proposal } from "../modals/proposal";
 
 // Submit Proposal using DaoHause
-
-
-
-
-async function createProposal(provider: WebsocketProvider, ) {
-
-
+export default async function createProposal(
+  instance: Contract,
+  p: Proposal
+): Promise<any> {
+  try {
+    await instance.methods
+      .submitProposal(
+        p.applicant,
+        p.sharesRequested,
+        p.lootRequested,
+        p.tributeOffered,
+        p.tributeToken,
+        p.paymentRequested,
+        p.paymentToken,
+        p.details,
+        p.flags
+      )
+      .call();
+  } catch (err) {
+    console.log(err);
+  }
 }
-
