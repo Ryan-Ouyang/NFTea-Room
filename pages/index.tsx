@@ -18,8 +18,10 @@ import sponsorProposal from "../utils/sponsorProposal";
 import submitVote from "../utils/submitVote";
 import { Vote } from "../modals/vote";
 import * as constants from "../constants";
+import { useRouter } from "next/router";
 
 export default function Home(props) {
+  const router = useRouter();
   const [suggestions, setSuggestions] = useState([]);
   useEffect(() => {
     props.suggestions && setSuggestions(props.suggestions);
@@ -56,44 +58,15 @@ export default function Home(props) {
   // Textile Stuff
   const { client, connectToTextile, token } = useContext(TextileContext);
 
-  // Submit Proposal
-  const submitProposal = async () => {
-    try {
-      let proposalId = await createProposal(daoHaus, cp);
-      let _proposalIndex = await sponsorProposal(daoHaus, proposalId);
-      setProposalIndex(_proposalIndex);
-      setIsSubmittedProposal(true);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
   // Submit Votes
   // TODO: Only works with yes right now
-
-  const submitVotes = async () => {
-    try {
-      await submitVote(daoHaus, proposalIndex, Vote.Yes);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const createSuggestion = async (data: any) => {
-    const suggestion: Suggestion = {
-      NFT_ID: data.NFT_ID,
-      new_price: data.new_price,
-      comments: [],
-    };
-
-    const result = await client.create(
-      ThreadID.fromString(dbThreadID),
-      dbCollectionID,
-      [suggestion]
-    );
-
-    alert("Successfully created proposal");
-    setSuggestions(await getSuggestions());
-  };
+  // const submitVotes = async () => {
+  //   try {
+  //     await submitVote(daoHaus, proposalIndex, Vote.Yes);
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
 
   const addComment = async (index: number, data: any) => {
     const suggestion = suggestions[index];
@@ -120,61 +93,36 @@ export default function Home(props) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>
+      <nav className="flex flex-row items-center p-3 md:px-16 border-b-2">
+        <div>NFTea Room</div>
+        <div className="flex-grow"></div>
         <Account triedToEagerConnect={triedToEagerConnect} />
-
-        {isConnected && (
-          <section>
-            <ETHBalance />
-
-            {/* Textile */}
-            {!client && (
-              <div>
-                <button onClick={() => connectToTextile()}>
-                  Connect to Textile
-                </button>
-                {!isSubmittedProposal ? (
-                  <button onClick={() => submitProposal()}>
-                    Submit Proposal
-                  </button>
-                ) : (
-                  <button onClick={() => submitVotes()}>Submit Vote</button>
-                )}
-              </div>
-            )}
-
-            {client && token && (
-              <Formik
-                initialValues={{ NFT_ID: "", new_price: 0 }}
-                onSubmit={(values, { setSubmitting }) => {
-                  createSuggestion(values);
-                  setSubmitting(false);
-                }}
-              >
-                {({ isSubmitting }) => (
-                  <Form>
-                    <label>NFT_ID:</label>
-                    <Field type="text" name="NFT_ID" />
-                    <br />
-                    <label>new_price:</label>
-                    <Field type="number" name="new_price" />
-                    <br />
-                    <button type="submit" disabled={isSubmitting}>
-                      Submit
-                    </button>
-                  </Form>
-                )}
-              </Formik>
-            )}
-          </section>
+        {isConnected && !client && (
+          <>
+            <button
+              className="ml-6 p-2 rounded border-2 border-black hover:text-blue-700"
+              onClick={() => connectToTextile()}
+            >
+              Connect to Textile
+            </button>
+          </>
         )}
+        {isConnected && client && (
+          <button
+            className="ml-6 p-2 rounded border-2 border-black hover:text-blue-700"
+            onClick={() => router.push("/proposals/create")}
+          >
+            Submit Proposal
+          </button>
+        )}
+      </nav>
 
+      <main>
         <section>
-          {suggestions.map(({ _id, NFT_ID, new_price, comments }, index) => {
-            console.log(comments);
+          {suggestions.map(({ _id, nft_id, new_price, comments }, index) => {
             return (
               <div className="suggestion" key={index}>
-                <h1>Name: {NFT_ID}</h1>
+                <h1>Name: {nft_id}</h1>
                 <p>New price: {new_price}</p>
                 <div>
                   {comments.map(({ identity, content }) => (
@@ -210,36 +158,6 @@ export default function Home(props) {
           })}
         </section>
       </main>
-
-      <style jsx>{`
-        main {
-          text-align: center;
-        }
-
-        .suggestion {
-          text-align: center;
-          border: 1px solid black;
-          max-width: 600px;
-          margin: 0 auto;
-        }
-      `}</style>
-
-      <style jsx global>{`
-        body {
-          margin: 0;
-        }
-
-        html {
-          font-family: sans-serif, Apple Color Emoji, Segoe UI Emoji,
-            Segoe UI Symbol, Noto Color Emoji;
-        }
-
-        *,
-        *::after,
-        *::before {
-          box-sizing: border-box;
-        }
-      `}</style>
     </div>
   );
 }

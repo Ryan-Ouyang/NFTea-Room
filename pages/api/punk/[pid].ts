@@ -38,11 +38,7 @@ type Offer = {
   amountOffered: string;
 };
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const {
-    query: { pid },
-  } = req;
-
+export const getPunkInfo = async (pid: number) => {
   const query = gql`
   {
     cryptoPunks(where: {id: "${pid}"}) {
@@ -69,7 +65,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     }
   }`;
 
-  let punkInfo = cryptopunks[pid as string] as PunkInfo;
+  let punkInfo = cryptopunks[(pid as unknown) as string] as PunkInfo;
   punkInfo.imageUrl = `https://www.larvalabs.com/cryptopunks/cryptopunk${pid}.png`;
 
   const graphData = await request(
@@ -79,5 +75,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   punkInfo.info = (graphData.cryptoPunks as CryptoPunk[])[0];
 
-  res.json(punkInfo);
+  return punkInfo;
 };
+
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  const {
+    query: { pid },
+  } = req;
+
+  const punkId = Number(pid);
+
+  res.json(getPunkInfo(punkId));
+};
+export default handler;
