@@ -69,24 +69,6 @@ export default function Home(props) {
   //   }
   // };
 
-  const addComment = async (index: number, data: any) => {
-    const suggestion = suggestions[index];
-
-    suggestion.comments.push({
-      identity: account,
-      content: data.text,
-    });
-
-    const result = await client.save(
-      ThreadID.fromString(dbThreadID),
-      dbCollectionID,
-      [suggestion]
-    );
-
-    alert("Successfully created comment");
-    setSuggestions(await getSuggestions());
-  };
-
   return (
     <div>
       <Head>
@@ -126,42 +108,17 @@ export default function Home(props) {
           <div className="grid grid-cols-3">
             {suggestions.map(({ _id, nft_id, new_price, comments }, index) => {
               return (
-                <div className="m-2 border border-gray-200 rounded" key={index}>
+                <div
+                  className="mx-auto my-2 border border-gray-200 rounded cursor-pointer"
+                  key={index}
+                  onClick={() => router.push(`/proposals/details/${index}`)}
+                >
                   <img src="https://www.larvalabs.com/cryptopunks/cryptopunk5.png" />
                   <div className="p-2">
                     <h1>Name: {nft_id}</h1>
                     <p>
                       Price: Ξ1 {"-->"} Ξ{new_price}
                     </p>
-                    <div>
-                      {comments.map(({ identity, content }) => (
-                        <div>
-                          <p>ID: {identity.substring(0, 5)}...</p>
-                          <p>Comment: {content}</p>
-                        </div>
-                      ))}
-                    </div>
-                    <div>
-                      {client && token && (
-                        <Formik
-                          initialValues={{ text: "" }}
-                          onSubmit={(values, { setSubmitting, resetForm }) => {
-                            addComment(index, values);
-                            resetForm();
-                            setSubmitting(false);
-                          }}
-                        >
-                          {({ isSubmitting }) => (
-                            <Form>
-                              <Field type="text" name="text" />
-                              <button type="submit" disabled={isSubmitting}>
-                                Comment
-                              </button>
-                            </Form>
-                          )}
-                        </Formik>
-                      )}
-                    </div>
                   </div>
                 </div>
               );
