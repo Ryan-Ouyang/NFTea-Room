@@ -15,6 +15,7 @@ import createProposal from "../utils/submitProposal";
 import sponsorProposal from "../utils/sponsorProposal";
 import submitVote from "../utils/submitVote";
 import { Vote } from "../modals/vote";
+import processProposal from "../utils/processProposal";
 
 export default function Home(props) {
   const [suggestions, setSuggestions] = useState([]);
@@ -28,6 +29,8 @@ export default function Home(props) {
   const isConnected = typeof account === "string" && !!library;
   const [isSubmittedProposal, setIsSubmittedProposal] = useState(false);
   const [proposalIndex, setProposalIndex] = useState(0);
+  const [isVotedProposal, setIsVotedProposal] = useState(false);
+
   // TODO: Change the details according to the proposal
   // Create Proposal options
   const cp: CreateProposalOptions = {
@@ -67,8 +70,22 @@ export default function Home(props) {
   const submitVotes = async () => {
     try {
       await submitVote(daoHaus, proposalIndex, Vote.Yes);
+      setTimeout(() => {
+        // functions
+        setIsVotedProposal(true);
+      }, 4 * 60 * 1000);
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  // Process Proposal
+
+  const processProposals = async () => {
+    try {
+      await processProposal(proposalIndex, daoHaus);
+    } catch (error) {
+      console.log(error);
     }
   };
   const createSuggestion = async (data: any) => {
@@ -127,11 +144,18 @@ export default function Home(props) {
                   Connect to Textile
                 </button>
                 {!isSubmittedProposal ? (
+                  // If Proposal has not been submitted
                   <button onClick={() => submitProposal()}>
                     Submit Proposal
                   </button>
-                ) : (
+                ) : !isVotedProposal ? (
+                  // If votes have not been submitted
                   <button onClick={() => submitVotes()}>Submit Vote</button>
+                ) : (
+                  // If Proposal has not been processed
+                  <button onClick={() => processProposals()}>
+                    Process Proposal
+                  </button>
                 )}
               </div>
             )}

@@ -6,7 +6,8 @@ export default async function processProposal(
   instance: Contract
 ): Promise<any> {
   try {
-    await instance.processProposal(proposalIndex);
+    let response = await instance.processProposal(proposalIndex);
+    await response.wait();
   } catch (err) {
     console.error(err);
   }
