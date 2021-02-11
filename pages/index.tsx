@@ -8,12 +8,12 @@ import React, { useContext, useEffect, useState } from "react";
 import { getSuggestions } from "./api/textile/getSuggestions";
 import { Field, Form, Formik } from "formik";
 import { ThreadID } from "@textile/hub";
-import { dbThreadID, Suggestion } from "../textile-helpers";
+import { dbCollectionID, dbThreadID, Suggestion } from "../textile-helpers";
 
 export default function Home(props) {
   const [suggestions, setSuggestions] = useState([]);
   useEffect(() => {
-    setSuggestions(props.suggestions);
+    props.suggestions && setSuggestions(props.suggestions);
   }, []);
 
   // ETH Stuff
@@ -28,15 +28,34 @@ export default function Home(props) {
     const suggestion: Suggestion = {
       NFT_ID: data.NFT_ID,
       new_price: data.new_price,
+      comments: [],
     };
 
     const result = await client.create(
       ThreadID.fromString(dbThreadID),
-      "Price-Suggestions",
+      dbCollectionID,
       [suggestion]
     );
 
     alert("Successfully created proposal");
+    setSuggestions(await getSuggestions());
+  };
+
+  const addComment = async (index: number, data: any) => {
+    const suggestion = suggestions[index];
+
+    suggestion.comments.push({
+      identity: account,
+      content: data.text,
+    });
+
+    const result = await client.save(
+      ThreadID.fromString(dbThreadID),
+      dbCollectionID,
+      [suggestion]
+    );
+
+    alert("Successfully created comment");
     setSuggestions(await getSuggestions());
   };
 
@@ -88,11 +107,41 @@ export default function Home(props) {
         )}
 
         <section>
-          {suggestions.map(({ NFT_ID, new_price }) => {
+          {suggestions.map(({ _id, NFT_ID, new_price, comments }, index) => {
+            console.log(comments);
             return (
-              <div className="suggestion">
+              <div className="suggestion" key={index}>
                 <h1>Name: {NFT_ID}</h1>
                 <p>New price: {new_price}</p>
+                <div>
+                  {comments.map(({ identity, content }) => (
+                    <div>
+                      <p>ID: {identity}</p>
+                      <p>Comment: {content}</p>
+                    </div>
+                  ))}
+                </div>
+                <div>
+                  {client && token && (
+                    <Formik
+                      initialValues={{ text: "" }}
+                      onSubmit={(values, { setSubmitting, resetForm }) => {
+                        addComment(index, values);
+                        resetForm();
+                        setSubmitting(false);
+                      }}
+                    >
+                      {({ isSubmitting }) => (
+                        <Form>
+                          <Field type="text" name="text" />
+                          <button type="submit" disabled={isSubmitting}>
+                            Comment
+                          </button>
+                        </Form>
+                      )}
+                    </Formik>
+                  )}
+                </div>
               </div>
             );
           })}
@@ -134,7 +183,6 @@ export default function Home(props) {
 
 export async function getServerSideProps(context) {
   const data = await getSuggestions();
-
   if (!data) {
     return {
       notFound: true,
