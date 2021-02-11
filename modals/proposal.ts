@@ -1,5 +1,5 @@
 import  {Vote} from './vote'
-interface Proposal {
+export interface Proposal {
     applicant : string; // the applicant who wishes to become a member - this key will be used for withdrawals (doubles as guild kick target for gkick proposals)
     proposer : string; // the account that submitted the proposal (can be non-member)
     sponsor: string; // the member that sponsored the proposal (moving it into the queue)
