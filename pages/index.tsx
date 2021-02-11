@@ -73,9 +73,11 @@ export default function Home(props) {
   };
   const createSuggestion = async (data: any) => {
     const suggestion: Suggestion = {
-      NFT_ID: data.NFT_ID,
+      nft_id: data.nft_id,
       new_price: data.new_price,
       comments: [],
+      proposal_id: 1,
+      proposal_index: 1,
     };
 
     const result = await client.create(
@@ -138,7 +140,7 @@ export default function Home(props) {
 
             {client && token && (
               <Formik
-                initialValues={{ NFT_ID: "", new_price: 0 }}
+                initialValues={{ nft_id: "", new_price: 0 }}
                 onSubmit={(values, { setSubmitting }) => {
                   createSuggestion(values);
                   setSubmitting(false);
@@ -146,8 +148,8 @@ export default function Home(props) {
               >
                 {({ isSubmitting }) => (
                   <Form>
-                    <label>NFT_ID:</label>
-                    <Field type="text" name="NFT_ID" />
+                    <label>nft_id:</label>
+                    <Field type="text" name="nft_id" />
                     <br />
                     <label>new_price:</label>
                     <Field type="number" name="new_price" />
@@ -163,11 +165,10 @@ export default function Home(props) {
         )}
 
         <section>
-          {suggestions.map(({ _id, NFT_ID, new_price, comments }, index) => {
-            console.log(comments);
+          {suggestions.map(({ _id, nft_id, new_price, comments }, index) => {
             return (
               <div className="suggestion" key={index}>
-                <h1>Name: {NFT_ID}</h1>
+                <h1>Name: {nft_id}</h1>
                 <p>New price: {new_price}</p>
                 <div>
                   {comments.map(({ identity, content }) => (

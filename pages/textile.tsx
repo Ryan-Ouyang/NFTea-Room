@@ -1,6 +1,11 @@
 import { Client, PrivateKey, UserAuth, ThreadID, KeyInfo } from "@textile/hub";
 import { useEffect, useState } from "react";
-import { dbThreadID, keyInfo, schema } from "../textile-helpers";
+import {
+  dbCollectionID,
+  dbThreadID,
+  keyInfo,
+  schema,
+} from "../textile-helpers";
 
 export default function Textile() {
   // Textile stuff
@@ -25,12 +30,13 @@ export default function Textile() {
   async function createDB() {
     const thread: ThreadID = await client.newDB(null, "name");
     console.log(thread.toString());
+
     return thread;
   }
 
   async function collectionFromSchema(client: Client) {
     await client.newCollection(ThreadID.fromString(dbThreadID), {
-      name: "Suggestions",
+      name: dbCollectionID,
       schema: schema,
     });
   }
