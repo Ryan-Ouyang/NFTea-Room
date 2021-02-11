@@ -16,9 +16,10 @@ export default async function submitVote(
     uintVote = 2;
   }
   try {
-    const submittedVote = await instance.submitVote(proposalIndex, uintVote);
-
-    console.log(submittedVote);
+    const response = await instance.submitVote(proposalIndex, uintVote, {
+      gasLimit: 300000,
+    });
+    await response.wait();
   } catch (e) {
     console.error(e);
   }

@@ -10,8 +10,11 @@ import { getSuggestions } from "./api/textile/getSuggestions";
 import { Field, Form, Formik } from "formik";
 import { ThreadID } from "@textile/hub";
 import CreateProposalOptions from "../modals/createProposalOptions";
-import submitProposal from "../utils/submitProposal";
 import { dbCollectionID, dbThreadID, Suggestion } from "../textile-helpers";
+import createProposal from "../utils/submitProposal";
+import sponsorProposal from "../utils/sponsorProposal";
+import submitVote from "../utils/submitVote";
+import { Vote } from "../modals/vote";
 
 export default function Home(props) {
   const [suggestions, setSuggestions] = useState([]);
@@ -23,34 +26,51 @@ export default function Home(props) {
   const { account, library } = useWeb3React();
   const triedToEagerConnect = useEagerConnect();
   const isConnected = typeof account === "string" && !!library;
+  const [isSubmittedProposal, setIsSubmittedProposal] = useState(false);
+  const [proposalIndex, setProposalIndex] = useState(0);
+  // TODO: Change the details according to the proposal
+  // Create Proposal options
+  const cp: CreateProposalOptions = {
+    applicant: account,
+    sharesRequested: 0,
+    lootRequested: 0,
+    tributeOffered: 0,
+    tributeToken: "0xebaadba116d4a72b985c3fae11d5a9a7291a3e70",
+    paymentRequested: 100000000,
+    paymentToken: "0xebaadba116d4a72b985c3fae11d5a9a7291a3e70",
+    details: "abcdef",
+  };
 
-  // const daohaus = useDaoHausContract(
-  //   "0xc33a4efecb11d2cad8e7d8d2a6b5e7feaccc521d"
-  // );
-  // console.log(daohaus);
-
-  // const cp: CreateProposalOptions = {
-  //   applicant: "0x0D1f2Bd5351a65a78Ac0BeF3C8fAEf643C046508",
-  //   sharesRequested: 0,
-  //   lootRequested: 0,
-  //   tributeOffered: 0,
-  //   tributeToken: "0x81d6967ca79138d07be57aee855485a14ae33891",
-  //   paymentRequested: 0,
-  //   paymentToken: "0x81d6967ca79138d07be57aee855485a14ae33891",
-  //   details: "abcdef",
-  // };
-
-  // useEffect(() => {
-  //   submitProposal(daohaus, cp)
-  //     .then((a) => {
-  //       console.log(a);
-  //     })
-  //     .catch((err) => console.log(err));
-  // }, []);
+  // Initialize Daohaus contract
+  const daoHaus = useDaoHausContract(
+    "0x3b9ad1e37a00d5430faeef38ad4aaefbd895091f"
+  );
 
   // Textile Stuff
   const { client, connectToTextile, token } = useContext(TextileContext);
 
+  // Submit Proposal
+  const submitProposal = async () => {
+    try {
+      let proposalId = await createProposal(daoHaus, cp);
+      let _proposalIndex = await sponsorProposal(daoHaus, proposalId);
+      setProposalIndex(_proposalIndex);
+      setIsSubmittedProposal(true);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // Submit Votes
+  // TODO: Only works with yes right now
+
+  const submitVotes = async () => {
+    try {
+      await submitVote(daoHaus, proposalIndex, Vote.Yes);
+    } catch (err) {
+      console.error(err);
+    }
+  };
   const createSuggestion = async (data: any) => {
     const suggestion: Suggestion = {
       NFT_ID: data.NFT_ID,
@@ -102,9 +122,18 @@ export default function Home(props) {
 
             {/* Textile */}
             {!client && (
-              <button onClick={() => connectToTextile()}>
-                Connect to Textile
-              </button>
+              <div>
+                <button onClick={() => connectToTextile()}>
+                  Connect to Textile
+                </button>
+                {!isSubmittedProposal ? (
+                  <button onClick={() => submitProposal()}>
+                    Submit Proposal
+                  </button>
+                ) : (
+                  <button onClick={() => submitVotes()}>Submit Vote</button>
+                )}
+              </div>
             )}
 
             {client && token && (
