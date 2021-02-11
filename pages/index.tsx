@@ -5,6 +5,8 @@ import Account from "../components/Account";
 import ETHBalance from "../components/ETHBalance";
 import useEagerConnect from "../hooks/useEagerConnect";
 import useDaoHausContract from "../hooks/useDaoHausContract";
+import usePriceTrackerContract from "../hooks/usePriceTrackerContract";
+import useMinionContract from "../hooks/useMinionContract";
 import { TextileContext } from "../contexts/textile";
 import React, { useContext, useEffect, useState } from "react";
 import { getSuggestions } from "./api/textile/getSuggestions";
@@ -16,6 +18,7 @@ import createProposal from "../utils/submitProposal";
 import sponsorProposal from "../utils/sponsorProposal";
 import submitVote from "../utils/submitVote";
 import { Vote } from "../modals/vote";
+import * as constants from "../constants";
 import { useRouter } from "next/router";
 
 export default function Home(props) {
@@ -29,6 +32,29 @@ export default function Home(props) {
   const { account, library } = useWeb3React();
   const triedToEagerConnect = useEagerConnect();
   const isConnected = typeof account === "string" && !!library;
+  const [isSubmittedProposal, setIsSubmittedProposal] = useState(false);
+  const [proposalIndex, setProposalIndex] = useState(0);
+  // TODO: Change the details according to the proposal
+  // Create Proposal options
+  const cp: CreateProposalOptions = {
+    applicant: account,
+    sharesRequested: 0,
+    lootRequested: 0,
+    tributeOffered: 0,
+    tributeToken: "0xebaadba116d4a72b985c3fae11d5a9a7291a3e70",
+    paymentRequested: 100000000,
+    paymentToken: "0xebaadba116d4a72b985c3fae11d5a9a7291a3e70",
+    details: "abcdef",
+  };
+
+  // Initialize Daohaus contract
+  const daoHaus = useDaoHausContract(constants.DAO_CONTRACT_ADDRESS);
+  // Initialize Minion contract
+  const minion = useMinionContract(constants.MINION_CONTRACT_ADDRESS);
+  // Initialize PriceTracker contract
+  const pricetracker = usePriceTrackerContract(
+    constants.PRICETRACKER_CONTRACT_ADDRESS
+  );
 
   // Textile Stuff
   const { client, connectToTextile, token } = useContext(TextileContext);

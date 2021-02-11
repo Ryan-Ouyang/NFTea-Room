@@ -6,7 +6,7 @@ import CreateProposalOptions from "../modals/createProposalOptions";
 export default async function createProposal(
   instance: Contract,
   p: CreateProposalOptions
-): Promise<any> {
+): Promise<number> {
   try {
     let response = await instance.submitProposal(
       p.applicant,
