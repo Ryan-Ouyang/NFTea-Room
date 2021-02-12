@@ -1,13 +1,10 @@
 import { Contract } from "@ethersproject/contracts";
-import { ThreadID } from "@textile/hub";
 import { BigNumber } from "ethers";
 import ProposeUpdatePriceActionOptions from "../modals/proposeUpdatePriceActionOptions";
-import { dbCollectionID, dbThreadID, Suggestion } from "../textile-helpers";
 
 // Propose an action to the Minion (returns proposalId)
 export default async function proposeUpdatePriceAction(
   instance: Contract,
-  textileClient: any,
   options: ProposeUpdatePriceActionOptions
 ): Promise<any> {
   try {
@@ -37,20 +34,6 @@ export default async function proposeUpdatePriceAction(
     }
 
     console.log(`Proposed action successfully! Proposal ID: ${proposalId}`);
-
-    const suggestion: Suggestion = {
-      nft_id: options.nftId.toString(),
-      new_price: options.price,
-      comments: [],
-      proposal_id: proposalId,
-      proposal_index: -1,
-    };
-
-    await textileClient.create(
-      ThreadID.fromString(dbThreadID),
-      dbCollectionID,
-      [suggestion]
-    );
 
     return proposalId;
   } catch (e) {
