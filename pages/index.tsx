@@ -1,22 +1,14 @@
 import { useWeb3React } from "@web3-react/core";
-import Head from "next/head";
-import Account from "../components/Account";
-import ETHBalance from "../components/ETHBalance";
-import useEagerConnect from "../hooks/useEagerConnect";
-import useDaoHausContract from "../hooks/useDaoHausContract";
-import { TextileContext } from "../contexts/textile";
-import React, { useContext, useEffect, useState } from "react";
-import { getSuggestions } from "./api/textile/getSuggestions";
 import { Field, Form, Formik } from "formik";
-import { ThreadID } from "@textile/hub";
-import CreateProposalOptions from "../modals/createProposalOptions";
-import { dbCollectionID, dbThreadID, Suggestion } from "../textile-helpers";
-import createProposal from "../utils/submitProposal";
-import sponsorProposal from "../utils/sponsorProposal";
-import submitVote from "../utils/submitVote";
-import { Vote } from "../modals/vote";
-import processProposal from "../utils/processProposal";
+import Head from "next/head";
 import { useRouter } from "next/router";
+import React, { useContext, useEffect, useState } from "react";
+import Account from "../components/Account";
+import { TextileContext } from "../contexts/textile";
+import useDaoHausContract from "../hooks/useDaoHausContract";
+import useEagerConnect from "../hooks/useEagerConnect";
+import CreateProposalOptions from "../modals/createProposalOptions";
+import { getSuggestions } from "./api/textile/getSuggestions";
 
 export default function Home(props) {
   const router = useRouter();

@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@material-ui/core": "^4.11.3",
     "@metamask/onboarding": "^1.0.0",
     "@textile/hub": "^6.0.2",
     "@web3-react/core": "^6.1.1",
