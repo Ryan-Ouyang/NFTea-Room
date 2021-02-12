@@ -56,7 +56,7 @@ export default function Home(props) {
   return (
     <div>
       <Head>
-        <title>ETHPack.tf</title>
+        <title>NFTea Room</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={classes.root}>
