@@ -37,20 +37,34 @@ export default function Home() {
   const moloch = useDaoHausContract(constants.DAO_CONTRACT_ADDRESS);
 
   useEffect(() => {
-    getSuggestions().then((res) => {
-      const notProcessed = {};
-      console.log(`Fetching flags for ${res.length} suggestions`);
-      for (let s of res) {
-        getProposalFlagsById(moloch, s.proposal_id).then((flags) => {
-          console.log(s.proposal_id, flags);
-          if (flags && flags[0] && !flags[1]) {
-            notProcessed[s.proposal_id] = true;
-          }
-        });
+    const fetchSuggestions = async () => {
+      const res = await getSuggestions();
+      for (let s1 of res) {
+        const flags = await getProposalFlagsById(moloch, s1.proposal_id);
+        if (flags && flags[0] && !flags[1]) {
+          s1.isNotProcessed = true;
+        }
       }
-      setIsNotProcessed(notProcessed);
+
       setSuggestions(res);
-    });
+    };
+
+    fetchSuggestions();
+
+    // getSuggestions().then((res) => {
+    //   const notProcessed = {};
+    //   console.log(`Fetching flags for ${res.length} suggestions`);
+    //   for (let s of res) {
+    //     getProposalFlagsById(moloch, s.proposal_id).then((flags) => {
+    //       console.log(s.proposal_id, flags);
+    //       if (flags && flags[0] && !flags[1]) {
+    //         notProcessed[s.proposal_id] = true;
+    //       }
+    //     });
+    //   }
+    //   setIsNotProcessed(notProcessed);
+    //   setSuggestions(fetchSuggestions());
+    // });
   }, []);
 
   // ETH Stuff
@@ -130,8 +144,11 @@ export default function Home() {
         <section className="container mx-auto mt-6">
           <div className="grid grid-cols-4">
             {suggestions.map(
-              ({ _id, nft_id, new_price, proposal_id }, index) => {
-                if (isNotProcessed[proposal_id]) {
+              (
+                { _id, nft_id, new_price, proposal_id, isNotProcessed },
+                index
+              ) => {
+                if (isNotProcessed) {
                   console.log(isNotProcessed);
                   return (
                     <div

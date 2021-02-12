@@ -16,7 +16,7 @@ import proposeUpdatePriceAction from "../../utils/proposeUpdatePriceAction";
 import sponsorProposal from "../../utils/sponsorProposal";
 import { getPunkInfo } from "../api/punk/[pid]";
 import Header from "../Header";
-import Bubbles from "./Bubbles.jsx";
+// import Bubbles from "./Bubbles.jsx";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -121,7 +121,7 @@ export default function Create() {
   };
   return (
     <div>
-      <Bubbles color="205,92,92" />
+      {/* <Bubbles color="205,92,92" /> */}
       <Header name="NFTea Room" title="Submit Price Suggestion" />
       <Card
         className={classes.root}
