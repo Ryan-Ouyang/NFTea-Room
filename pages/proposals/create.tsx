@@ -121,7 +121,7 @@ export default function Create() {
   };
   return (
     <div>
-      <Bubbles color="205,92,92" />
+      <Bubbles color="205,92,92" style={{ zIndex: -999 }} />
       <Header />
       <Card
         className={classes.root}
