@@ -28,12 +28,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Home(props) {
+export default function Home() {
   const router = useRouter();
   const classes = useStyles();
   const [suggestions, setSuggestions] = useState([]);
+
   useEffect(() => {
-    props.suggestions && setSuggestions(props.suggestions);
+    getSuggestions().then((res) => {
+      setSuggestions(res);
+    });
   }, []);
 
   // ETH Stuff
@@ -226,17 +229,17 @@ export default function Home(props) {
   );
 }
 
-export async function getServerSideProps(context) {
-  const data = await getSuggestions();
-  if (!data) {
-    return {
-      notFound: true,
-    };
-  }
+// export async function getServerSideProps(context) {
+//   const data = await getSuggestions();
+//   if (!data) {
+//     return {
+//       notFound: true,
+//     };
+//   }
 
-  return {
-    props: {
-      suggestions: data,
-    }, // will be passed to the page component as props
-  };
-}
+//   return {
+//     props: {
+//       suggestions: data,
+//     }, // will be passed to the page component as props
+//   };
+// }

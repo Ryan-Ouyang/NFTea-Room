@@ -21,6 +21,18 @@ export const getSuggestionById = async (id: string): Promise<any> => {
   );
 };
 
+export const getSuggestionByProposalId = async (id: string): Promise<any> => {
+  const client = await Client.withKeyInfo(keyInfo);
+  const token = await client.getToken(PrivateKey.fromRandom());
+
+  const query = new Where("proposal_id").eq(id);
+  return await client.find(
+    ThreadID.fromString(dbThreadID),
+    dbCollectionID,
+    query
+  );
+};
+
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const result = getSuggestions();
   res.json(result);
