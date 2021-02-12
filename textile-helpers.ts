@@ -15,6 +15,7 @@ export const schema = {
     new_price: { type: "number" },
     proposal_id: { type: "number" },
     proposal_index: { type: "number" },
+    details: { type: "string" },
     comments: {
       type: "array",
       items: {
@@ -34,7 +35,7 @@ export const schema = {
 
 export const dbThreadID =
   "bafksuyczsxgl3p6mlwk5qwx6jtcsvuftl7y5y2t4xj7j2qxhtpaod5i";
-export const dbCollectionID = "Proposals";
+export const dbCollectionID = "Price-Proposals";
 
 export type Suggestion = {
   nft_id: string;
@@ -42,4 +43,5 @@ export type Suggestion = {
   comments: object[];
   proposal_id: number;
   proposal_index: number;
+  details: string;
 };
