@@ -43,8 +43,12 @@ export default function Home() {
         const flags = await getProposalFlagsById(moloch, s1.proposal_id);
         if (flags && flags[0] && !flags[1]) {
           s1.isNotProcessed = true;
+        } else {
+          s1.isNotProcessed = false;
         }
       }
+
+      console.log(res);
 
       setSuggestions(res);
     };
