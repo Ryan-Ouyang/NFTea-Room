@@ -3,25 +3,45 @@ import TextField from "@material-ui/core/TextField";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import Header from "../Header";
+import { request, gql } from "graphql-request";
+
+export const getPriceTracker = async () => {
+  const query = gql`
+    {
+      priceTrackers {
+        id
+        nftId
+        price
+      }
+    }
+  `;
+
+  const graphData = await request(
+    "https://api.thegraph.com/subgraphs/name/sneh1999/pricetracker",
+    query
+  );
+  console.log(graphData);
+  return graphData.priceTrackers;
+};
 
 export default function PriceTracker() {
   const router = useRouter();
   const [tempPriceTracker, setTempPriceTracker] = useState([]);
-  const temp = [
-    { id: "1", price: 1 },
-    { id: "2", price: 2 },
-    { id: "3", price: 3 },
-    { id: "4", price: 4 },
-    { id: "5", price: 5 },
-    { id: "6", price: 6 },
-    { id: "17", price: 17 },
-  ];
+  const [priceTracker, setPriceTracker] = useState([]);
+
   const handleChange = (e) => {
-    const result = temp.filter((value) => value.id!.startsWith(e.target.value));
-    setTempPriceTracker(result);
+    if (priceTracker.length > 0) {
+      const result = priceTracker.filter((value) =>
+        value.nftId.startsWith(e.target.value)
+      );
+      setTempPriceTracker(result);
+    }
   };
   useEffect(() => {
-    setTempPriceTracker(temp);
+    getPriceTracker().then((result) => {
+      setPriceTracker(result);
+      setTempPriceTracker(result);
+    });
   }, []);
 
   return (
@@ -43,7 +63,7 @@ export default function PriceTracker() {
         />
 
         <div className="grid grid-cols-5">
-          {tempPriceTracker.map(({ id, price }, index) => {
+          {tempPriceTracker.map(({ nftId, price }, index) => {
             return (
               <div
                 className="m-2 border border-gray-200 rounded"
@@ -60,12 +80,12 @@ export default function PriceTracker() {
                     width: "100%",
                   }}
                 >
-                  Cryptopunk #{id}: Ξ{price}
+                  Cryptopunk #{nftId}: Ξ{price}
                 </Typography>
                 <img
                   src={
                     "https://www.larvalabs.com/cryptopunks/cryptopunk" +
-                    id +
+                    nftId +
                     ".png"
                   }
                   style={{

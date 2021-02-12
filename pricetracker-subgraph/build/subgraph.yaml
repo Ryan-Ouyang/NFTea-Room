@@ -1,0 +1,27 @@
+specVersion: 0.0.2
+schema:
+  file: schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Contract
+    network: rinkeby
+    source:
+      address: "0x6ABDd218fB26183C6014411608Bc517501666b5D"
+      abi: Contract
+      startBlock: 8000000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - GetPrice
+        - UpdatedPrice
+      abis:
+        - name: Contract
+          file: Contract/abis/Contract.json
+      eventHandlers:
+        - event: GetPrice(uint64,uint256,string)
+          handler: handleGetPrice
+        - event: UpdatedPrice(uint64,uint256,uint256,string)
+          handler: handleUpdatedPrice
+      file: Contract/Contract.wasm
