@@ -1,25 +1,17 @@
+import { Breadcrumbs, Button, Typography } from "@material-ui/core";
 import { useWeb3React } from "@web3-react/core";
-import Head from "next/head";
-import Image from "next/image";
-import Account from "../components/Account";
-import ETHBalance from "../components/ETHBalance";
-import useEagerConnect from "../hooks/useEagerConnect";
-import useDaoHausContract from "../hooks/useDaoHausContract";
-import usePriceTrackerContract from "../hooks/usePriceTrackerContract";
-import useMinionContract from "../hooks/useMinionContract";
-import { TextileContext } from "../contexts/textile";
-import React, { useContext, useEffect, useState } from "react";
-import { getSuggestions } from "./api/textile/getSuggestions";
 import { Field, Form, Formik } from "formik";
-import { ThreadID } from "@textile/hub";
-import CreateProposalOptions from "../modals/createProposalOptions";
-import { dbCollectionID, dbThreadID, Suggestion } from "../textile-helpers";
-import createProposal from "../utils/submitProposal";
-import sponsorProposal from "../utils/sponsorProposal";
-import submitVote from "../utils/submitVote";
-import { Vote } from "../modals/vote";
-import * as constants from "../constants";
+import Head from "next/head";
 import { useRouter } from "next/router";
+import React, { useContext, useEffect, useState } from "react";
+import Account from "../components/Account";
+import * as constants from "../constants";
+import { TextileContext } from "../contexts/textile";
+import useDaoHausContract from "../hooks/useDaoHausContract";
+import useEagerConnect from "../hooks/useEagerConnect";
+import useMinionContract from "../hooks/useMinionContract";
+import usePriceTrackerContract from "../hooks/usePriceTrackerContract";
+import { getSuggestions } from "./api/textile/getSuggestions";
 
 export default function Home(props) {
   const router = useRouter();
@@ -32,20 +24,6 @@ export default function Home(props) {
   const { account, library } = useWeb3React();
   const triedToEagerConnect = useEagerConnect();
   const isConnected = typeof account === "string" && !!library;
-  const [isSubmittedProposal, setIsSubmittedProposal] = useState(false);
-  const [proposalIndex, setProposalIndex] = useState(0);
-  // TODO: Change the details according to the proposal
-  // Create Proposal options
-  const cp: CreateProposalOptions = {
-    applicant: account,
-    sharesRequested: 0,
-    lootRequested: 0,
-    tributeOffered: 0,
-    tributeToken: "0xebaadba116d4a72b985c3fae11d5a9a7291a3e70",
-    paymentRequested: 100000000,
-    paymentToken: "0xebaadba116d4a72b985c3fae11d5a9a7291a3e70",
-    details: "abcdef",
-  };
 
   // Initialize Daohaus contract
   const daoHaus = useDaoHausContract(constants.DAO_CONTRACT_ADDRESS);
@@ -61,6 +39,44 @@ export default function Home(props) {
 
   // Submit Votes
   // TODO: Only works with yes right now
+
+  // const submitVotes = async () => {
+  //   try {
+  //     await submitVote(daoHaus, proposalIndex, Vote.Yes);
+  //     setTimeout(() => {
+  //       // functions
+  //       setIsVotedProposal(true);
+  //     }, 4 * 60 * 1000);
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
+
+  // Process Proposal
+
+  // const processProposals = async () => {
+  //   try {
+  //     await processProposal(proposalIndex, daoHaus);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+  // const createSuggestion = async (data: any) => {
+  //   const suggestion: Suggestion = {
+  //     NFT_ID: data.NFT_ID,
+  //     new_price: data.new_price,
+  //     comments: [],
+  // };
+
+  // const result = await client.create(
+  //   ThreadID.fromString(dbThreadID),
+  //   dbCollectionID,
+  //   [suggestions]
+  // );
+
+  //   alert("Successfully created proposal");
+  //   setSuggestions(await getSuggestions());
+  // };
   // const submitVotes = async () => {
   //   try {
   //     await submitVote(daoHaus, proposalIndex, Vote.Yes);
@@ -76,14 +92,33 @@ export default function Home(props) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <nav className="flex flex-row items-center p-3 md:px-16 border-b-2">
-        <div>NFTea Room</div>
+      <nav
+        className="flex flex-row items-center p-3 md:px-16 border-b-2"
+        style={{
+          backgroundColor: "#3f50b5",
+          color: "white",
+        }}
+      >
+        <div>
+          <Typography
+            variant="h6"
+            component="h5"
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              display: "flex",
+              width: "100%",
+            }}
+          >
+            NFTea Room
+          </Typography>
+        </div>
         <div className="flex-grow"></div>
         <Account triedToEagerConnect={triedToEagerConnect} />
         {isConnected && !client && (
           <>
             <button
-              className="ml-6 p-2 rounded border-2 border-black hover:text-blue-700"
+              className="ml-6 p-2 rounded border-2 border-white hover:text-grey-700"
               onClick={() => connectToTextile()}
             >
               Connect to Textile
@@ -92,7 +127,7 @@ export default function Home(props) {
         )}
         {isConnected && client && (
           <button
-            className="ml-6 p-2 rounded border-2 border-black hover:text-blue-700"
+            className="ml-6 p-2 rounded border-2 border-white hover:text-grey-700"
             onClick={() => router.push("/proposals/create")}
           >
             Submit Proposal
@@ -101,23 +136,72 @@ export default function Home(props) {
       </nav>
 
       <main>
-        <h1 className="text-xl text-center mt-4">
-          Currently Active Proposals:
-        </h1>
+        <Typography
+          variant="h5"
+          component="h5"
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            display: "flex",
+            width: "100%",
+            marginTop: "1em",
+          }}
+        >
+          Currently Active Proposals
+        </Typography>
         <section className="container mx-auto mt-6">
           <div className="grid grid-cols-3">
             {suggestions.map(({ _id, nft_id, new_price, comments }, index) => {
               return (
                 <div
-                  className="mx-auto my-2 border border-gray-200 rounded cursor-pointer"
+                  className="m-2 border border-gray-200 rounded"
                   key={index}
                   onClick={() => router.push(`/proposals/details/${index}`)}
                 >
-                  <img src="https://www.larvalabs.com/cryptopunks/cryptopunk5.png" />
+                  <Typography
+                    variant="h6"
+                    component="h5"
+                    style={{
+                      justifyContent: "center",
+                      alignItems: "center",
+                      display: "flex",
+                      width: "100%",
+                    }}
+                  >
+                    <strong>Name</strong>: Cryptopunk #{nft_id}
+                  </Typography>
+                  <img
+                    src={
+                      "https://www.larvalabs.com/cryptopunks/cryptopunk" +
+                      nft_id +
+                      ".png"
+                    }
+                    style={{
+                      justifyContent: "center",
+                      alignItems: "center",
+                      display: "flex",
+                      width: "100%",
+                    }}
+                  />
                   <div className="p-2">
-                    <h1>Name: {nft_id}</h1>
-                    <p>
-                      Price: Ξ1 {"-->"} Ξ{new_price}
+                    <p
+                      style={{
+                        justifyContent: "center",
+                        alignItems: "center",
+                        display: "flex",
+                        width: "100%",
+                      }}
+                    >
+                      <Breadcrumbs separator="›" aria-label="breadcrumb">
+                        <Typography color="textPrimary">
+                          <strong>Price</strong>
+                        </Typography>
+                        <Typography color="textPrimary">Ξ1</Typography>
+
+                        <Typography color="textPrimary">
+                          Ξ{new_price}
+                        </Typography>
+                      </Breadcrumbs>
                     </p>
                   </div>
                 </div>

@@ -20,3 +20,8 @@ Uses boilerplate: https://github.com/mirshko/next-web3-boilerplate
 - Modified Minion contract to include `paymentRequested` and `sharesRequested` as part of `proposeAction`
 - Deploy blank `Minion` first
 - Deploy `MinionFactory` with `template = address(Minion)` second
+- Call `summonMinion` on MinionFactory
+- Fund some ETH to minion
+- Call `proposalId := proposeAction`
+- DAO `proposalIdx := sponsorProposal` `submitVote(proposalIdx)` and `processProposal(proposalIdx)`
+- Call `executeAction(proposalId)`

@@ -1,6 +1,6 @@
 export default interface ProposeUpdatePriceActionOptions {
   actionTo: string;
-  actionValue: number;
+  actionValue: any;
   nftId: number;
   price: number;
   details: string;

@@ -49,7 +49,7 @@ const Account = ({ triedToEagerConnect }) => {
       window?.web3;
 
     return (
-      <div className="ml-6 p-2 rounded border-2 border-black">
+      <div className="ml-6 p-2 rounded border-2 border-white">
         {hasMetaMaskOrWeb3Available ? (
           <button
             isLoading={connecting}
@@ -86,7 +86,8 @@ const Account = ({ triedToEagerConnect }) => {
         target: "_blank",
         rel: "noopener noreferrer",
       }}
-      className="ml-6 p-2 rounded border-2 border-black"
+      className="ml-6 p-2 rounded border-2 border-white"
+      style={{ color: "lightgrey" }}
     >
       {ENSName || `${shortenHex(account, 4)}`}
     </a>

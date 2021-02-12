@@ -8,45 +8,35 @@ export default async function proposeUpdatePriceAction(
   options: ProposeUpdatePriceActionOptions
 ): Promise<any> {
   try {
-    let dataString = "0x10e689ab"; // 0x10e689ab is method ID for updatePrice
-    let param1HexString = decimalToHex(options.nftId, 64);
-    let param2HexString = decimalToHex(options.price, 64);
-
-    dataString = dataString + param1HexString + param2HexString;
-
     let response = await instance.proposeAction(
       options.actionTo,
-      options.actionValue,
-      dataString,
+      "3000000000000000",
+      options.nftId,
+      options.price,
       options.details,
       options.paymentRequested,
       options.sharesRequested,
       {
-        gasLimit: 300000,
+        gasLimit: 400000,
       }
     );
+
     let result = await response.wait();
+
+    let proposalId: number = 0;
 
     for (let event of result.events) {
       if (event.event === "ProposeAction") {
-        return (event.args[0] as BigNumber).toNumber();
+        console.log(event.event);
+        proposalId = (event.args[0] as BigNumber).toNumber();
+        break;
       }
     }
+
+    console.log(`Proposed action successfully! Proposal ID: ${proposalId}`);
+
+    return proposalId;
   } catch (e) {
     console.error(e);
   }
-}
-
-function decimalToHex(d: number, padding: number): string {
-  var hex = Number(d).toString(16);
-  padding =
-    typeof padding === "undefined" || padding === null
-      ? (padding = 2)
-      : padding;
-
-  while (hex.length < padding) {
-    hex = "0" + hex;
-  }
-
-  return hex;
 }
