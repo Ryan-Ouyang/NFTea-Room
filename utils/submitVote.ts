@@ -8,6 +8,7 @@ export default async function submitVote(
 ): Promise<void> {
   let uintVote: number;
 
+  console.log("Trying to submit vote on proposal index: " + proposalIndex);
   if (vote === Vote.Null) {
     uintVote = 0;
   } else if (vote === Vote.Yes) {
@@ -17,7 +18,7 @@ export default async function submitVote(
   }
   try {
     const response = await instance.submitVote(proposalIndex, uintVote, {
-      gasLimit: 300000,
+      gasLimit: 400000,
     });
     await response.wait();
   } catch (e) {

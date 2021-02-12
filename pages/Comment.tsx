@@ -35,10 +35,9 @@ function Comment({ identity, content }: CommentProps) {
       <Card
         className={classes.root}
         style={{
-          justifyContent: "center",
-          alignItems: "center",
           display: "flex",
-          width: "100%",
+          width: "80%",
+          margin: "auto",
         }}
         variant="outlined"
       >

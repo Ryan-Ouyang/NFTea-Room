@@ -60,7 +60,7 @@ export default function PriceTracker() {
                     width: "100%",
                   }}
                 >
-                  Cryptopunk #{id}: ${price}
+                  Cryptopunk #{id}: Ξ{price}
                 </Typography>
                 <img
                   src={
