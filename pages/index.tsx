@@ -37,72 +37,6 @@ export default function Home(props) {
   // Textile Stuff
   const { client, connectToTextile, token } = useContext(TextileContext);
 
-  // Submit Votes
-  // TODO: Only works with yes right now
-
-  // const submitVotes = async () => {
-  //   try {
-  //     await submitVote(daoHaus, proposalIndex, Vote.Yes);
-  //     setTimeout(() => {
-  //       // functions
-  //       setIsVotedProposal(true);
-  //     }, 4 * 60 * 1000);
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
-
-  // Process Proposal
-
-  // const processProposals = async () => {
-  //   try {
-  //     await processProposal(proposalIndex, daoHaus);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-  // const createSuggestion = async (data: any) => {
-  //   const suggestion: Suggestion = {
-  //     NFT_ID: data.NFT_ID,
-  //     new_price: data.new_price,
-  //     comments: [],
-  // };
-
-  // const result = await client.create(
-  //   ThreadID.fromString(dbThreadID),
-  //   dbCollectionID,
-  //   [suggestions]
-  // );
-
-  //   alert("Successfully created proposal");
-  //   setSuggestions(await getSuggestions());
-  // };
-  // const submitVotes = async () => {
-  //   try {
-  //     await submitVote(daoHaus, proposalIndex, Vote.Yes);
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
-
-  const addComment = async (index: number, data: any) => {
-    const suggestion = suggestions[index];
-
-    suggestion.comments.push({
-      identity: account,
-      content: data.text,
-    });
-
-    // const result = await client.save(
-    //   ThreadID.fromString(dbThreadID),
-    //   dbCollectionID,
-    //   [suggestion]
-    // );
-
-    alert("Successfully created comment");
-    setSuggestions(await getSuggestions());
-  };
-
   return (
     <div>
       <Head>
@@ -133,7 +67,7 @@ export default function Home(props) {
         </div>
         <div className="flex-grow"></div>
         <Account triedToEagerConnect={triedToEagerConnect} />
-        {isConnected && !client && (
+        {isConnected && (!client || !token) && (
           <>
             <button
               className="ml-6 p-2 rounded border-2 border-white hover:text-grey-700"
@@ -143,7 +77,7 @@ export default function Home(props) {
             </button>
           </>
         )}
-        {isConnected && client && (
+        {isConnected && client && token && (
           <button
             className="ml-6 p-2 rounded border-2 border-white hover:text-grey-700"
             onClick={() => router.push("/proposals/create")}
@@ -171,7 +105,11 @@ export default function Home(props) {
           <div className="grid grid-cols-5">
             {suggestions.map(({ _id, nft_id, new_price, comments }, index) => {
               return (
-                <div className="m-2 border border-gray-200 rounded" key={index}>
+                <div
+                  className="m-2 border border-gray-200 rounded"
+                  key={index}
+                  onClick={() => router.push(`/proposals/details/${index}`)}
+                >
                   <Typography
                     variant="h7"
                     component="h5"
@@ -217,35 +155,6 @@ export default function Home(props) {
                         </Typography>
                       </Breadcrumbs>
                     </p>
-                    <div>
-                      {/* {comments.map(({ identity, content }) => (
-                        <div>
-                          <p>ID: {identity.substring(0, 5)}...</p>
-                          <p>Comment: {content}</p>
-                        </div>
-                      ))} */}
-                    </div>
-                    <div>
-                      {client && token && (
-                        <Formik
-                          initialValues={{ text: "" }}
-                          onSubmit={(values, { setSubmitting, resetForm }) => {
-                            addComment(index, values);
-                            resetForm();
-                            setSubmitting(false);
-                          }}
-                        >
-                          {({ isSubmitting }) => (
-                            <Form>
-                              <Field type="text" name="text" />
-                              <button type="submit" disabled={isSubmitting}>
-                                Comment
-                              </button>
-                            </Form>
-                          )}
-                        </Formik>
-                      )}
-                    </div>
                   </div>
                 </div>
               );
