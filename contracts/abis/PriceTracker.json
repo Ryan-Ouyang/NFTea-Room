@@ -1,6 +1,12 @@
 [
 	{
-		"inputs": [],
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_minion",
+				"type": "address"
+			}
+		],
 		"stateMutability": "nonpayable",
 		"type": "constructor"
 	},
@@ -9,15 +15,15 @@
 		"inputs": [
 			{
 				"indexed": false,
-				"internalType": "uint8",
+				"internalType": "uint64",
 				"name": "id",
-				"type": "uint8"
+				"type": "uint64"
 			},
 			{
 				"indexed": false,
-				"internalType": "uint64",
+				"internalType": "uint256",
 				"name": "price",
-				"type": "uint64"
+				"type": "uint256"
 			},
 			{
 				"indexed": false,
@@ -34,21 +40,21 @@
 		"inputs": [
 			{
 				"indexed": false,
-				"internalType": "uint8",
+				"internalType": "uint64",
 				"name": "id",
-				"type": "uint8"
+				"type": "uint64"
 			},
 			{
 				"indexed": false,
-				"internalType": "uint64",
+				"internalType": "uint256",
 				"name": "oldPrice",
-				"type": "uint64"
+				"type": "uint256"
 			},
 			{
 				"indexed": false,
-				"internalType": "uint64",
+				"internalType": "uint256",
 				"name": "newPrice",
-				"type": "uint64"
+				"type": "uint256"
 			},
 			{
 				"indexed": false,
@@ -63,9 +69,9 @@
 	{
 		"inputs": [
 			{
-				"internalType": "uint8",
+				"internalType": "uint64",
 				"name": "_nftId",
-				"type": "uint8"
+				"type": "uint64"
 			}
 		],
 		"name": "getPrice",
@@ -74,19 +80,13 @@
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "uint8",
-				"name": "",
-				"type": "uint8"
-			}
-		],
-		"name": "nfts",
+		"inputs": [],
+		"name": "minion",
 		"outputs": [
 			{
-				"internalType": "uint64",
+				"internalType": "address",
 				"name": "",
-				"type": "uint64"
+				"type": "address"
 			}
 		],
 		"stateMutability": "view",
@@ -95,14 +95,33 @@
 	{
 		"inputs": [
 			{
-				"internalType": "uint8",
-				"name": "_nftId",
-				"type": "uint8"
-			},
+				"internalType": "uint64",
+				"name": "",
+				"type": "uint64"
+			}
+		],
+		"name": "nfts",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
 			{
 				"internalType": "uint64",
-				"name": "_price",
+				"name": "_nftId",
 				"type": "uint64"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_price",
+				"type": "uint256"
 			}
 		],
 		"name": "updatePrice",

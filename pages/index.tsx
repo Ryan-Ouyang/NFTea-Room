@@ -1,4 +1,5 @@
 import { useWeb3React } from "@web3-react/core";
+import * as constants from "../constants";
 import { Field, Form, Formik } from "formik";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -7,8 +8,9 @@ import Account from "../components/Account";
 import { TextileContext } from "../contexts/textile";
 import useDaoHausContract from "../hooks/useDaoHausContract";
 import useEagerConnect from "../hooks/useEagerConnect";
-import CreateProposalOptions from "../modals/createProposalOptions";
+import useMinionContract from "../hooks/useMinionContract";
 import { getSuggestions } from "./api/textile/getSuggestions";
+import usePriceTrackerContract from "../hooks/usePriceTrackerContract";
 
 export default function Home(props) {
   const router = useRouter();
@@ -23,24 +25,15 @@ export default function Home(props) {
   const isConnected = typeof account === "string" && !!library;
   const [isSubmittedProposal, setIsSubmittedProposal] = useState(false);
   const [proposalIndex, setProposalIndex] = useState(0);
-  const [isVotedProposal, setIsVotedProposal] = useState(false);
-
   // TODO: Change the details according to the proposal
-  // Create Proposal options
-  const cp: CreateProposalOptions = {
-    applicant: account,
-    sharesRequested: 0,
-    lootRequested: 0,
-    tributeOffered: 0,
-    tributeToken: "0xebaadba116d4a72b985c3fae11d5a9a7291a3e70",
-    paymentRequested: 100000000,
-    paymentToken: "0xebaadba116d4a72b985c3fae11d5a9a7291a3e70",
-    details: "abcdef",
-  };
 
   // Initialize Daohaus contract
-  const daoHaus = useDaoHausContract(
-    "0x3b9ad1e37a00d5430faeef38ad4aaefbd895091f"
+  const daoHaus = useDaoHausContract(constants.DAO_CONTRACT_ADDRESS);
+  // Initialize Minion contract
+  const minion = useMinionContract(constants.MINION_CONTRACT_ADDRESS);
+  // Initialize PriceTracker contract
+  const pricetracker = usePriceTrackerContract(
+    constants.PRICETRACKER_CONTRACT_ADDRESS
   );
 
   // Textile Stuff
@@ -144,44 +137,54 @@ export default function Home(props) {
       </nav>
 
       <main>
-        <section>
-          {suggestions.map(({ _id, nft_id, new_price, comments }, index) => {
-            return (
-              <div className="suggestion" key={index}>
-                <h1>Name: {nft_id}</h1>
-                <p>New price: {new_price}</p>
-                <div>
-                  {comments.map(({ identity, content }) => (
+        <h1 className="text-xl text-center mt-4">
+          Currently Active Proposals:
+        </h1>
+        <section className="container mx-auto mt-6">
+          <div className="grid grid-cols-3">
+            {suggestions.map(({ _id, nft_id, new_price, comments }, index) => {
+              return (
+                <div className="m-2 border border-gray-200 rounded" key={index}>
+                  <img src="https://www.larvalabs.com/cryptopunks/cryptopunk5.png" />
+                  <div className="p-2">
+                    <h1>Name: {nft_id}</h1>
+                    <p>
+                      Price: Ξ1 {"-->"} Ξ{new_price}
+                    </p>
                     <div>
-                      <p>ID: {identity}</p>
-                      <p>Comment: {content}</p>
+                      {comments.map(({ identity, content }) => (
+                        <div>
+                          <p>ID: {identity.substring(0, 5)}...</p>
+                          <p>Comment: {content}</p>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-                <div>
-                  {client && token && (
-                    <Formik
-                      initialValues={{ text: "" }}
-                      onSubmit={(values, { setSubmitting, resetForm }) => {
-                        addComment(index, values);
-                        resetForm();
-                        setSubmitting(false);
-                      }}
-                    >
-                      {({ isSubmitting }) => (
-                        <Form>
-                          <Field type="text" name="text" />
-                          <button type="submit" disabled={isSubmitting}>
-                            Comment
-                          </button>
-                        </Form>
+                    <div>
+                      {client && token && (
+                        <Formik
+                          initialValues={{ text: "" }}
+                          onSubmit={(values, { setSubmitting, resetForm }) => {
+                            addComment(index, values);
+                            resetForm();
+                            setSubmitting(false);
+                          }}
+                        >
+                          {({ isSubmitting }) => (
+                            <Form>
+                              <Field type="text" name="text" />
+                              <button type="submit" disabled={isSubmitting}>
+                                Comment
+                              </button>
+                            </Form>
+                          )}
+                        </Formik>
                       )}
-                    </Formik>
-                  )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </section>
       </main>
     </div>
