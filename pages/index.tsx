@@ -12,9 +12,25 @@ import useEagerConnect from "../hooks/useEagerConnect";
 import useMinionContract from "../hooks/useMinionContract";
 import usePriceTrackerContract from "../hooks/usePriceTrackerContract";
 import { getSuggestions } from "./api/textile/getSuggestions";
+import { makeStyles } from "@material-ui/core/styles";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+  },
+  menuButton: {
+    marginRight: theme.spacing(2),
+  },
+  title: {
+    flexGrow: 1,
+  },
+}));
 
 export default function Home(props) {
   const router = useRouter();
+  const classes = useStyles();
   const [suggestions, setSuggestions] = useState([]);
   useEffect(() => {
     props.suggestions && setSuggestions(props.suggestions);
@@ -109,8 +125,52 @@ export default function Home(props) {
         <title>ETHPack.tf</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
-      <nav
+      <div className={classes.root}>
+        <AppBar position="static">
+          <Toolbar>
+            <Button
+              onClick={() => {
+                router.push("/");
+              }}
+            >
+              <Typography variant="h6" style={{ color: "white" }}>
+                NFTea Room
+              </Typography>
+            </Button>
+            <div className="flex-grow"></div>
+            <Button
+              onClick={() => router.push("/priceguide/priceguide")}
+              style={{ color: "white", marginRight: "10px" }}
+              variant="outlined"
+            >
+              Price Tracker
+            </Button>
+            {isConnected && !client && (
+              <>
+                <Button
+                  onClick={() => connectToTextile()}
+                  style={{ color: "white" }}
+                  variant="outlined"
+                >
+                  Connect to Textile
+                </Button>
+              </>
+            )}
+            {isConnected && client && (
+              <Button
+                onClick={() => router.push("/proposals/create")}
+                style={{ color: "white" }}
+                variant="outlined"
+              >
+                Submit Proposal
+              </Button>
+            )}
+            <div className="flex-grow"></div>
+            <Account triedToEagerConnect={triedToEagerConnect} />
+          </Toolbar>
+        </AppBar>
+      </div>
+      {/* <nav
         className="flex flex-row items-center p-3 md:px-16 border-b-2"
         style={{
           backgroundColor: "#3f50b5",
@@ -151,7 +211,7 @@ export default function Home(props) {
             Submit Proposal
           </button>
         )}
-      </nav>
+      </nav> */}
 
       <main>
         <Typography
