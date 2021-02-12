@@ -168,12 +168,12 @@ export default function Home(props) {
           Currently Active Proposals
         </Typography>
         <section className="container mx-auto mt-6">
-          <div className="grid grid-cols-3">
+          <div className="grid grid-cols-5">
             {suggestions.map(({ _id, nft_id, new_price, comments }, index) => {
               return (
                 <div className="m-2 border border-gray-200 rounded" key={index}>
                   <Typography
-                    variant="h6"
+                    variant="h7"
                     component="h5"
                     style={{
                       justifyContent: "center",
