@@ -37,54 +37,6 @@ export default function Home(props) {
   // Textile Stuff
   const { client, connectToTextile, token } = useContext(TextileContext);
 
-  // Submit Votes
-  // TODO: Only works with yes right now
-
-  // const submitVotes = async () => {
-  //   try {
-  //     await submitVote(daoHaus, proposalIndex, Vote.Yes);
-  //     setTimeout(() => {
-  //       // functions
-  //       setIsVotedProposal(true);
-  //     }, 4 * 60 * 1000);
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
-
-  // Process Proposal
-
-  // const processProposals = async () => {
-  //   try {
-  //     await processProposal(proposalIndex, daoHaus);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-  // const createSuggestion = async (data: any) => {
-  //   const suggestion: Suggestion = {
-  //     NFT_ID: data.NFT_ID,
-  //     new_price: data.new_price,
-  //     comments: [],
-  // };
-
-  // const result = await client.create(
-  //   ThreadID.fromString(dbThreadID),
-  //   dbCollectionID,
-  //   [suggestions]
-  // );
-
-  //   alert("Successfully created proposal");
-  //   setSuggestions(await getSuggestions());
-  // };
-  // const submitVotes = async () => {
-  //   try {
-  //     await submitVote(daoHaus, proposalIndex, Vote.Yes);
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
-
   return (
     <div>
       <Head>
@@ -115,7 +67,7 @@ export default function Home(props) {
         </div>
         <div className="flex-grow"></div>
         <Account triedToEagerConnect={triedToEagerConnect} />
-        {isConnected && !client && (
+        {isConnected && (!client || !token) && (
           <>
             <button
               className="ml-6 p-2 rounded border-2 border-white hover:text-grey-700"
@@ -125,7 +77,7 @@ export default function Home(props) {
             </button>
           </>
         )}
-        {isConnected && client && (
+        {isConnected && client && token && (
           <button
             className="ml-6 p-2 rounded border-2 border-white hover:text-grey-700"
             onClick={() => router.push("/proposals/create")}
