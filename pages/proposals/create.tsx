@@ -15,8 +15,8 @@ import PunkInfo from "../../modals/PunkInfo";
 import proposeUpdatePriceAction from "../../utils/proposeUpdatePriceAction";
 import sponsorProposal from "../../utils/sponsorProposal";
 import { getPunkInfo } from "../api/punk/[pid]";
-import Bubbles from "./Bubbles.jsx";
 import Header from "../Header";
+import Bubbles from "./Bubbles.jsx";
 
 const useStyles = makeStyles((theme) => ({
   root: {

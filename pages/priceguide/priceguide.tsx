@@ -20,8 +20,16 @@ export const getPriceTracker = async () => {
     "https://api.thegraph.com/subgraphs/name/sneh1999/pricetracker",
     query
   );
-  console.log(graphData);
-  return graphData.priceTrackers;
+  let result = [];
+  for (let pt of graphData.priceTrackers) {
+    if (!result.some((r) => r.nftId === pt.nftId)) {
+      result.push({
+        nftId: pt.nftId,
+        price: pt.price,
+      });
+    }
+  }
+  return result;
 };
 
 export default function PriceTracker() {
