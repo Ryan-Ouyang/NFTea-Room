@@ -56,7 +56,7 @@ export default function Home(props) {
   return (
     <div>
       <Head>
-        <title>ETHPack.tf</title>
+        <title>NFTea Room</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={classes.root}>
@@ -166,7 +166,7 @@ export default function Home(props) {
             {suggestions.map(({ _id, nft_id, new_price, comments }, index) => {
               return (
                 <div
-                  className="m-2 border border-gray-200 rounded"
+                  className="m-2 border border-gray-200 rounded cursor-pointer"
                   key={index}
                   onClick={() => router.push(`/proposals/details/${index}`)}
                 >

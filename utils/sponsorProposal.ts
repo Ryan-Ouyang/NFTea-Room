@@ -21,6 +21,7 @@ export default async function sponsorProposal(
           comments: [],
           proposal_id: proposalId,
           proposal_index: proposalIndex,
+          details: options.details,
         };
 
         await textileClient.create(
