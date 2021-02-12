@@ -171,7 +171,7 @@ export default function Home(props) {
                   onClick={() => router.push(`/proposals/details/${index}`)}
                 >
                   <Typography
-                    variant="h7"
+                    variant="h6"
                     component="h5"
                     style={{
                       justifyContent: "center",

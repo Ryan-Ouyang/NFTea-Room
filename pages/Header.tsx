@@ -36,7 +36,9 @@ export default function Header(props) {
             </Typography>
           </Button>
           <div className="flex-grow"></div>
-          <Typography variant="h6">{props.title}</Typography>
+          <Typography style={{ marginRight: "175px" }} variant="h6">
+            {props.title}
+          </Typography>
           <div className="flex-grow"></div>
         </Toolbar>
       </AppBar>
