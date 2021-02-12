@@ -38,7 +38,6 @@ function Comment({ identity, content }: CommentProps) {
           justifyContent: "center",
           alignItems: "center",
           display: "flex",
-          marginTop: "10%",
           width: "100%",
         }}
         variant="outlined"
