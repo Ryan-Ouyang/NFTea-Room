@@ -92,6 +92,11 @@
 				"type": "address"
 			},
 			{
+				"internalType": "address",
+				"name": "pricetracker",
+				"type": "address"
+			},
+			{
 				"internalType": "string",
 				"name": "details",
 				"type": "string"

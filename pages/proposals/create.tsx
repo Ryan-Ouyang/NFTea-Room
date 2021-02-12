@@ -1,14 +1,16 @@
-import { ThreadID } from "@textile/hub";
 import { useWeb3React } from "@web3-react/core";
+import { randomInt } from "crypto";
+import { BigNumber } from "ethers";
 import { Field, Form, Formik } from "formik";
-import React, { useContext, useState } from "react";
+import { useRouter } from "next/router";
+import React, { useContext, useEffect, useState } from "react";
+import * as consts from "../../constants";
 import { TextileContext } from "../../contexts/textile";
 import useDaoHausContract from "../../hooks/useDaoHausContract";
-import CreateProposalOptions from "../../modals/createProposalOptions";
-import { Suggestion, dbThreadID, dbCollectionID } from "../../textile-helpers";
-import sponsorProposal from "../../utils/sponsorProposal";
-import createProposal from "../../utils/submitProposal";
-import { useRouter } from "next/router";
+import useMinionContract from "../../hooks/useMinionContract";
+import ProposeUpdatePriceActionOptions from "../../modals/proposeUpdatePriceActionOptions";
+import proposeUpdatePriceAction from "../../utils/proposeUpdatePriceAction";
+import executeAction from "../../utils/executeAction";
 
 export default function Create() {
   const router = useRouter();
@@ -21,59 +23,78 @@ export default function Create() {
   const [proposalIndex, setProposalIndex] = useState(0);
 
   // TODO: Change the details according to the proposal
-  // Create Proposal options
-  const cp: CreateProposalOptions = {
-    applicant: account,
-    sharesRequested: 0,
-    lootRequested: 0,
-    tributeOffered: 0,
-    tributeToken: "0xebaadba116d4a72b985c3fae11d5a9a7291a3e70",
-    paymentRequested: 100000000,
-    paymentToken: "0xebaadba116d4a72b985c3fae11d5a9a7291a3e70",
-    details: "abcdef",
-  };
 
   // Initialize Daohaus contract
-  const daoHaus = useDaoHausContract(
-    "0x3b9ad1e37a00d5430faeef38ad4aaefbd895091f"
-  );
+  const daoHaus = useDaoHausContract(consts.DAO_CONTRACT_ADDRESS);
+  const minion = useMinionContract(consts.MINION_CONTRACT_ADDRESS);
 
-  // DAO - Submit Proposal
-  const submitProposal = async () => {
+  async function submitProposal(data: any) {
     try {
-      let proposalId = await createProposal(daoHaus, cp);
-      let _proposalIndex = await sponsorProposal(daoHaus, proposalId);
-      setProposalIndex(_proposalIndex);
-      setIsSubmittedProposal(true);
-    } catch (err) {
-      console.log(err);
+      const options: ProposeUpdatePriceActionOptions = {
+        actionTo: consts.PRICETRACKER_CONTRACT_ADDRESS,
+        actionValue: 1,
+        nftId: data.nft_id,
+        price: data.new_price,
+        details: "Update Price of #1000",
+        paymentRequested: 5,
+        sharesRequested: 1,
+      };
+      let proposalId = await proposeUpdatePriceAction(minion, client, options);
+      console.log("Submitted Proposal ID: ", proposalId);
+      router.push("/");
+    } catch (e) {
+      console.error(e);
     }
-  };
-
-  // Textile - Create Proposal
-  const createSuggestion = async (data: any) => {
-    const suggestion: Suggestion = {
-      nft_id: data.nft_id,
-      new_price: data.new_price,
-      comments: [],
-      proposal_id: 1,
-      proposal_index: 1,
-    };
-
-    const result = await client.create(
-      ThreadID.fromString(dbThreadID),
-      dbCollectionID,
-      [suggestion]
-    );
-
-    alert("Successfully created proposal");
-    router.push("/");
-  };
-
-  if (!isConnected || !client || !token) {
-    alert("You are not connected to Metamask or Textile");
-    router.push("/");
   }
+
+  async function execute() {
+    try {
+      await executeAction(minion, 1);
+      console.log("Executed proposal id 1");
+      router.push("/");
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  // // DAO - Submit Proposal
+  // const submitProposal = async () => {
+  //   try {
+  //     let proposalId = await createProposal(daoHaus, cp);
+  //     let _proposalIndex = await sponsorProposal(daoHaus, proposalId);
+  //     setProposalIndex(_proposalIndex);
+  //     setIsSubmittedProposal(true);
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
+
+  // // Textile - Create Proposal
+  // const createSuggestion = async (data: any) => {
+  //   const suggestion: Suggestion = {
+  //     nft_id: data.nft_id,
+  //     new_price: data.new_price,
+  //     comments: [],
+  //     proposal_id: 1,
+  //     proposal_index: 1,
+  //   };
+
+  //   const result = await client.create(
+  //     ThreadID.fromString(dbThreadID),
+  //     dbCollectionID,
+  //     [suggestion]
+  //   );
+
+  //   alert("Successfully created proposal");
+  //   router.push("/");
+  // };
+
+  useEffect(() => {
+    if (!isConnected || !client || !token) {
+      console.error("You are not connected to MetaMask or Textile");
+      router.push("/");
+    }
+  }, []);
 
   return (
     <div>
@@ -82,9 +103,14 @@ export default function Create() {
           <Formik
             initialValues={{ nft_id: "", new_price: 0 }}
             onSubmit={(values, { setSubmitting }) => {
-              createSuggestion(values);
+              submitProposal(values);
               setSubmitting(false);
             }}
+            // onSubmit={(values) => {
+            //   // setSubmitting(false);
+            //   console.log(values);
+            //   submitProposal(values);
+            // }}
           >
             {({ isSubmitting }) => (
               <Form>
@@ -97,6 +123,7 @@ export default function Create() {
                 <button type="submit" disabled={isSubmitting}>
                   Submit
                 </button>
+                <button onClick={execute}>Execute</button>
               </Form>
             )}
           </Formik>

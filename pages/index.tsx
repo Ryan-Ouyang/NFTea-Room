@@ -1,24 +1,18 @@
-import { useWeb3React } from "@web3-react/core";
-import Head from "next/head";
-import Account from "../components/Account";
-import ETHBalance from "../components/ETHBalance";
-import useEagerConnect from "../hooks/useEagerConnect";
-import useDaoHausContract from "../hooks/useDaoHausContract";
-import usePriceTrackerContract from "../hooks/usePriceTrackerContract";
-import useMinionContract from "../hooks/useMinionContract";
-import { TextileContext } from "../contexts/textile";
-import React, { useContext, useEffect, useState } from "react";
-import { getSuggestions } from "./api/textile/getSuggestions";
-import { Field, Form, Formik } from "formik";
 import { ThreadID } from "@textile/hub";
-import CreateProposalOptions from "../modals/createProposalOptions";
-import { dbCollectionID, dbThreadID, Suggestion } from "../textile-helpers";
-import createProposal from "../utils/submitProposal";
-import sponsorProposal from "../utils/sponsorProposal";
-import submitVote from "../utils/submitVote";
-import { Vote } from "../modals/vote";
-import * as constants from "../constants";
+import { useWeb3React } from "@web3-react/core";
+import { Field, Form, Formik } from "formik";
+import Head from "next/head";
 import { useRouter } from "next/router";
+import React, { useContext, useEffect, useState } from "react";
+import Account from "../components/Account";
+import * as constants from "../constants";
+import { TextileContext } from "../contexts/textile";
+import useDaoHausContract from "../hooks/useDaoHausContract";
+import useEagerConnect from "../hooks/useEagerConnect";
+import useMinionContract from "../hooks/useMinionContract";
+import usePriceTrackerContract from "../hooks/usePriceTrackerContract";
+import { dbCollectionID, dbThreadID } from "../textile-helpers";
+import { getSuggestions } from "./api/textile/getSuggestions";
 
 export default function Home(props) {
   const router = useRouter();
@@ -34,17 +28,6 @@ export default function Home(props) {
   const [isSubmittedProposal, setIsSubmittedProposal] = useState(false);
   const [proposalIndex, setProposalIndex] = useState(0);
   // TODO: Change the details according to the proposal
-  // Create Proposal options
-  const cp: CreateProposalOptions = {
-    applicant: account,
-    sharesRequested: 0,
-    lootRequested: 0,
-    tributeOffered: 0,
-    tributeToken: "0xebaadba116d4a72b985c3fae11d5a9a7291a3e70",
-    paymentRequested: 100000000,
-    paymentToken: "0xebaadba116d4a72b985c3fae11d5a9a7291a3e70",
-    details: "abcdef",
-  };
 
   // Initialize Daohaus contract
   const daoHaus = useDaoHausContract(constants.DAO_CONTRACT_ADDRESS);

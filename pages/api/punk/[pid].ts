@@ -65,7 +65,7 @@ export const getPunkInfo = async (pid: number) => {
     }
   }`;
 
-  let punkInfo = cryptopunks[(pid as unknown) as string] as PunkInfo;
+  let punkInfo = cryptopunks[pid.toString()] as PunkInfo;
   punkInfo.imageUrl = `https://www.larvalabs.com/cryptopunks/cryptopunk${pid}.png`;
 
   const graphData = await request(
@@ -85,6 +85,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const punkId = Number(pid);
 
-  res.json(getPunkInfo(punkId));
+  return res.json(await getPunkInfo(punkId));
 };
 export default handler;
