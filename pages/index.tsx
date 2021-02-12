@@ -15,6 +15,7 @@ import { getSuggestions } from "./api/textile/getSuggestions";
 import { makeStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
+import getProposalFlagsById from "../utils/getProposalFlagsById";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -32,9 +33,22 @@ export default function Home() {
   const router = useRouter();
   const classes = useStyles();
   const [suggestions, setSuggestions] = useState([]);
+  const [isNotProcessed, setIsNotProcessed] = useState({});
+  const moloch = useDaoHausContract(constants.DAO_CONTRACT_ADDRESS);
 
   useEffect(() => {
     getSuggestions().then((res) => {
+      const notProcessed = {};
+      console.log(`Fetching flags for ${res.length} suggestions`);
+      for (let s of res) {
+        getProposalFlagsById(moloch, s.proposal_id).then((flags) => {
+          console.log(s.proposal_id, flags);
+          if (flags && flags[0] && !flags[1]) {
+            notProcessed[s.proposal_id] = true;
+          }
+        });
+      }
+      setIsNotProcessed(notProcessed);
       setSuggestions(res);
     });
   }, []);
@@ -43,15 +57,6 @@ export default function Home() {
   const { account, library } = useWeb3React();
   const triedToEagerConnect = useEagerConnect();
   const isConnected = typeof account === "string" && !!library;
-
-  // Initialize Daohaus contract
-  const daoHaus = useDaoHausContract(constants.DAO_CONTRACT_ADDRESS);
-  // Initialize Minion contract
-  const minion = useMinionContract(constants.MINION_CONTRACT_ADDRESS);
-  // Initialize PriceTracker contract
-  const pricetracker = usePriceTrackerContract(
-    constants.PRICETRACKER_CONTRACT_ADDRESS
-  );
 
   // Textile Stuff
   const { client, connectToTextile, token } = useContext(TextileContext);
@@ -107,48 +112,6 @@ export default function Home() {
           </Toolbar>
         </AppBar>
       </div>
-      {/* <nav
-        className="flex flex-row items-center p-3 md:px-16 border-b-2"
-        style={{
-          backgroundColor: "#3f50b5",
-          color: "white",
-        }}
-      >
-        <div>
-          <Typography
-            variant="h6"
-            component="h5"
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-              display: "flex",
-              width: "100%",
-            }}
-          >
-            NFTea Room
-          </Typography>
-        </div>
-        <div className="flex-grow"></div>
-        <Account triedToEagerConnect={triedToEagerConnect} />
-        {isConnected && (!client || !token) && (
-          <>
-            <button
-              className="ml-6 p-2 rounded border-2 border-white hover:text-grey-700"
-              onClick={() => connectToTextile()}
-            >
-              Connect to Textile
-            </button>
-          </>
-        )}
-        {isConnected && client && token && (
-          <button
-            className="ml-6 p-2 rounded border-2 border-white hover:text-grey-700"
-            onClick={() => router.push("/proposals/create")}
-          >
-            Submit Proposal
-          </button>
-        )}
-      </nav> */}
 
       <main>
         <Typography
@@ -165,63 +128,59 @@ export default function Home() {
           Currently Active Proposals
         </Typography>
         <section className="container mx-auto mt-6">
-          <div className="grid grid-cols-5">
-            {suggestions.map(({ _id, nft_id, new_price, comments }, index) => {
-              return (
-                <div
-                  className="m-2 border border-gray-200 rounded cursor-pointer"
-                  key={index}
-                  onClick={() => router.push(`/proposals/details/${index}`)}
-                >
-                  <Typography
-                    variant="h6"
-                    component="h5"
-                    style={{
-                      justifyContent: "center",
-                      alignItems: "center",
-                      display: "flex",
-                      width: "100%",
-                    }}
-                  >
-                    <strong>Name</strong>: Cryptopunk #{nft_id}
-                  </Typography>
-                  <img
-                    src={
-                      "https://www.larvalabs.com/cryptopunks/cryptopunk" +
-                      nft_id +
-                      ".png"
-                    }
-                    style={{
-                      justifyContent: "center",
-                      alignItems: "center",
-                      display: "flex",
-                      width: "100%",
-                    }}
-                  />
-                  <div className="p-2">
-                    <p
-                      style={{
-                        justifyContent: "center",
-                        alignItems: "center",
-                        display: "flex",
-                        width: "100%",
-                      }}
+          <div className="grid grid-cols-4">
+            {suggestions.map(
+              ({ _id, nft_id, new_price, proposal_id }, index) => {
+                if (isNotProcessed[proposal_id]) {
+                  console.log(isNotProcessed);
+                  return (
+                    <div
+                      className="m-2 border border-gray-200 rounded cursor-pointer"
+                      key={index}
+                      onClick={() => router.push(`/proposals/details/${index}`)}
                     >
-                      <Breadcrumbs separator="›" aria-label="breadcrumb">
-                        <Typography color="textPrimary">
-                          <strong>Price</strong>
-                        </Typography>
-                        <Typography color="textPrimary">Ξ1</Typography>
+                      <Typography
+                        variant="h6"
+                        component="h5"
+                        style={{
+                          justifyContent: "center",
+                          alignItems: "center",
+                          display: "flex",
+                          width: "100%",
+                        }}
+                      >
+                        <strong>Name</strong>: Cryptopunk #{nft_id}
+                      </Typography>
+                      <img
+                        src={
+                          "https://www.larvalabs.com/cryptopunks/cryptopunk" +
+                          nft_id +
+                          ".png"
+                        }
+                        style={{
+                          justifyContent: "center",
+                          alignItems: "center",
+                          display: "flex",
+                          width: "100%",
+                        }}
+                      />
+                      <div className="p-2">
+                        <Breadcrumbs separator="›" aria-label="breadcrumb">
+                          <Typography color="textPrimary">
+                            <strong>Price</strong>
+                          </Typography>
+                          <Typography color="textPrimary">Ξ1</Typography>
 
-                        <Typography color="textPrimary">
-                          Ξ{new_price}
-                        </Typography>
-                      </Breadcrumbs>
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
+                          <Typography color="textPrimary">
+                            Ξ{new_price}
+                          </Typography>
+                        </Breadcrumbs>
+                      </div>
+                    </div>
+                  );
+                }
+              }
+            )}
           </div>
         </section>
       </main>

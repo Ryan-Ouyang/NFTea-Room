@@ -17,7 +17,7 @@ export default async function proposeUpdatePriceAction(
       options.paymentRequested,
       options.sharesRequested,
       {
-        gasLimit: 400000,
+        gasLimit: 1000000,
       }
     );
 

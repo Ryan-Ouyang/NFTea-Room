@@ -31,6 +31,7 @@ import submitVote from "../../../utils/submitVote";
 import executeAction from "../../../utils/executeAction";
 import processProposal from "../../../utils/processProposal";
 import getProposalFlagsById from "../../../utils/getProposalFlagsById";
+import getProposalVotes from "../../../utils/getProposalVotes";
 
 const useStyles = makeStyles({
   root: {
@@ -58,6 +59,7 @@ export default function Details({ proposal }) {
   const { account, library } = useWeb3React();
   const { client, token } = useContext(TextileContext);
   const [hasVoted, setHasVoted] = useState(false);
+  const [commentText, setCommentText] = useState("");
 
   const {
     _id,
@@ -68,15 +70,18 @@ export default function Details({ proposal }) {
     proposal_index,
     details,
   } = proposal;
-  console.log(proposal);
-  const [currComments, setCurrComments] = useState([]);
+  const [currComments, setCurrComments] = useState(comments);
   const [proposalFlags, setProposalFlags] = useState([]);
+  const [yesVotes, setYesVotes] = useState(0);
+  const [noVotes, setNoVotes] = useState(0);
 
   useEffect(() => {
-    comments && setCurrComments(comments);
     getProposalFlagsById(moloch, proposal_id).then((flags) => {
-      console.log("flags:", flags);
-      setProposalFlags(flags);
+      getProposalVotes(moloch, proposal_id).then((res) => {
+        setProposalFlags(flags);
+        setYesVotes(res.yesVotes);
+        setNoVotes(res.noVotes);
+      });
     });
   }, []);
 
@@ -86,6 +91,9 @@ export default function Details({ proposal }) {
       setHasVoted(true);
       let flags = await getProposalFlagsById(moloch, proposal_id);
       setProposalFlags(flags);
+      let votes = await getProposalVotes(moloch, proposal_id);
+      setYesVotes(votes.yesVotes);
+      setNoVotes(votes.noVotes);
     } catch (e) {
       console.error(e);
     }
@@ -96,17 +104,23 @@ export default function Details({ proposal }) {
       await processProposal(proposal_index, moloch);
       await executeAction(minion, proposal_id);
       let flags = await getProposalFlagsById(moloch, proposal_id);
-      console.log("flags:", flags);
       setProposalFlags(flags);
+      let votes = await getProposalVotes(moloch, proposal_id);
+      setYesVotes(votes.yesVotes);
+      setNoVotes(votes.noVotes);
     } catch (e) {
       console.error(e);
     }
   }
 
+  function handleTextChange(e) {
+    setCommentText(e.target.value);
+  }
+
   const addComment = async (data: any) => {
     proposal.comments.push({
       identity: account,
-      content: data.text,
+      content: commentText,
     });
 
     const result = await client.save(
@@ -115,9 +129,10 @@ export default function Details({ proposal }) {
       [proposal]
     );
 
-    alert("Successfully created comment");
-    const suggestion = await getSuggestionById(_id);
-    setCurrComments(suggestion.comments);
+    console.log("Successfully created comment");
+    //const suggestion = await getSuggestionById(_id);
+    setCurrComments(proposal.comments);
+    setCommentText("");
   };
 
   return (
@@ -152,17 +167,7 @@ export default function Details({ proposal }) {
               Cryptopunk #{nft_id}
             </Typography>
             <Typography variant="body2" component="p">
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s, when an unknown printer took a galley of
-              type and scrambled it to make a type specimen book. It has
-              survived not only five centuries, but also the leap into
-              electronic typesetting, remaining essentially unchanged. It was
-              popularised in the 1960s with the release of Letraset sheets
-              containing Lorem Ipsum passages, and more recently with desktop
-              publishing software like Aldus PageMaker including versions of
-              Lorem Ipsum.
-              {/* {details} */}
+              {details}
             </Typography>
             <br />
             <Breadcrumbs
@@ -178,7 +183,11 @@ export default function Details({ proposal }) {
               <Typography color="textPrimary">Ξ{new_price}</Typography>
             </Breadcrumbs>
             <br />
-            {!hasVoted && proposalFlags[0] && !proposalFlags[1] ? (
+            <Typography color="textPrimary">Yes Votes: {yesVotes}</Typography>
+            <br />
+            <Typography color="textPrimary">No Votes: {noVotes}</Typography>
+            <br />
+            {proposalFlags && proposalFlags[0] && !proposalFlags[1] ? (
               <>
                 <ButtonGroup
                   variant="contained"
@@ -201,25 +210,24 @@ export default function Details({ proposal }) {
                 </ButtonGroup>
                 <br />
                 <br />
-                {proposalFlags[0] && !proposalFlags[1] && (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    style={{ marginLeft: "36%" }}
-                    onClick={() => handleProcess()}
-                  >
-                    Process Proposal
-                  </Button>
-                )}
+                <Button
+                  variant="contained"
+                  color="primary"
+                  style={{ marginLeft: "36%" }}
+                  onClick={() => handleProcess()}
+                >
+                  Process Proposal
+                </Button>
               </>
             ) : null}
           </CardContent>
         </Card>
       </Box>
       <div>
-        {comments.map(({ identity, content }, i) => (
-          <Comment key={i} identity={identity} content={content} />
-        ))}
+        {currComments &&
+          currComments.map(({ identity, content }, i) => (
+            <Comment key={i} identity={identity} content={content} />
+          ))}
       </div>
       <div>
         {client && token && (
@@ -238,6 +246,8 @@ export default function Details({ proposal }) {
                   variant="outlined"
                   type="text"
                   name="text"
+                  onChange={(e) => handleTextChange(e)}
+                  value={commentText}
                   placeholder="Comment..."
                   style={{
                     width: "80%",
@@ -248,6 +258,7 @@ export default function Details({ proposal }) {
                 <br />
                 <Button
                   color="primary"
+                  type="submit"
                   variant="contained"
                   disabled={isSubmitting}
                   style={{
