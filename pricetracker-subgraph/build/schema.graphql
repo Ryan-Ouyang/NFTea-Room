@@ -1,5 +1,0 @@
-type PriceTracker @entity {
-  id: ID!
-  nftId: BigInt!
-  price: BigInt!
-}
