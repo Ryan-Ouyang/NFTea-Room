@@ -1,6 +1,5 @@
-This is a starter template for [Learn Next.js](https://nextjs.org/learn).
-
-Uses boilerplate: https://github.com/mirshko/next-web3-boilerplate
+Submitted to ETHDenver 2021 (won Open Track finalist, Textile, DAOHaus, and IPFS prizes).
+Devfolio link: https://devfolio.co/submissions/nftea-room-5944
 
 ## Workflow
 
