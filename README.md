@@ -1,4 +1,5 @@
 Submitted to ETHDenver 2021 (won Open Track finalist, Textile, DAOHaus, and IPFS prizes).
+
 Devfolio link: https://devfolio.co/submissions/nftea-room-5944
 
 ## Workflow
